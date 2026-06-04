@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(npm run lint*)",
+      "Bash(npm run typecheck*)",
+      "Bash(npm run test*)",
+      "Bash(npm run build*)",
+      "Bash(npm run migration:status*)",
+      "Bash(npm run migration:up*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)"
+    ],
+    "ask": [
+      "Bash(npm run migration:generate*)",
+      "Bash(npm run migration:down*)",
+      "Bash(npm run migration:fresh*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(docker*)",
+      "Bash(npm install*)",
+      "Bash(npx *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(DROP DATABASE*)",
+      "Bash(DROP TABLE*)",
+      "Bash(TRUNCATE*)",
+      "Bash(curl*)",
+      "Bash(wget*)"
+    ]
+  },
+  "claudeMdExcludes": [
+    "node_modules",
+    "dist",
+    ".turbo",
+    "coverage"
+  ]
+}
