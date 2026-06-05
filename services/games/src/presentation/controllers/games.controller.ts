@@ -1,7 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { HealthCheckResponseDto } from "../dtos/health-check-response.dto";
 
-@Controller()
+@Controller("")
 export class GamesController {
   @Get("health")
   check(): HealthCheckResponseDto {

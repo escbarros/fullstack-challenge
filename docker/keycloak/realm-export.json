@@ -6,6 +6,23 @@
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "accessTokenLifespan": 3600,
+  "components": {
+    "org.keycloak.keys.KeyProvider": [
+      {
+        "id": "crash-game-rsa-key",
+        "name": "rsa",
+        "providerId": "rsa",
+        "subComponents": {},
+        "config": {
+          "privateKey": ["MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDI4638ynr/nkopC7DCMIL0NeKPHrRlLjErXdP/4+JP7no+0h0/foEHz1GJtIPoY6+3ezsZgMitZhXpsImt0UlgxCX8bAlFN7eZ/aMJprWyrtCPaz3VI03Dr/X3CdqqMO4hqHj6gCIHWBb5TA5sWZ9O891PSSbWUFRUQD8UfA8LhhR6Wutgo5LDLbub+NSe6GAZKmXAY5SSpFeN9KJ2wcYYmC2hFGAWncQZ9Ofr3V2sAfYvAruOYE9+ppXcxSdWHleagioBO+vM/NqQniAUNkSb2CUjOAgShyzb3erUN5eE0g1uJoxkp4IoGxSQssu6V8sBZmQeVSyGvMKEZBj+wNN9AgMBAAECggEACrwP2gg/1lTxBYx4X4gUF1ShzKAJZ7a2LekPoQbeWwMVSTIVGgV6g55SbxdUTSC2jQlquQwmrQ1dcmValg0u7JrOpNRpEmfNyc7B3Ywo/WlV/7PtU+xVBXXroM3H/3wp3WaRQGGEb/wHDj9ALg4D80YYt1njV2RnfTEJreCLNURWl5BPKbN+67NZEglznglv+bDrclZONUHzcepVtgiEsAO9jns4nwNQviuJ6nXhqr1R2djXcTfa0ow2hn9FM15y0CeNjUSrg5rOJ5SC7GqSBuBJ3a3wRo8WtrPCmxZM1b2/D7b5jz5ZEglIpox0yz7AhZT2NPHBYA7yolpuRShyQQKBgQD1nNvEpInsVAiYWlhs4uNFeYNPEn1yL6rztrRKFO1J3WVy6HL8MhzT9/gIvZOTyrg2g4HAv/o54E8plpRXDWngVUkrFrbA32IT7zcvkBstzfzrOs7e23qcC+u+m4suChSNZvKdsgiO1dq97oudh2Hb/q4kvURLtPsOLjCKWkRU5QKBgQDRYp74Y06tEm7p2AfLoL/No4jjRTx//OnXWa4GMIsKAiXlGodujFkwWma3RIaZcRQyD5oIQKJRF+fwPiocQyzG6BCqWej3ceTrAbNdzrS3FQikDY94ILoDvhMeapvALKAzdSTtOEGmiX1mlOn4RbUu4GZjylWR4kD+82/ko7PyuQKBgQDyKT3lm/UAtbnjvPACK5G5Jh15ENnug2Eh+bm4cPmkIk2sBdOZJC+YLpy2wXOH/A+0b+S2jpHADpD+iCCp0+fX7z685SA6+gRRc0IN+x9RAg+kPc9Jm0xAHuDIhcOsGPQ6lo4PPUGC0wdgzJmLL7gkl+5K+vEjU8VULeZeArHsoQKBgQCmqAuGAm0Fvm0/fS4/OlRP1gFHe7061dA+Eug7jvmr3qfQ4bu4FseKf/nPlyBXEzUS324ncWKAjzmR87jKxADo1J8nJ+cQxLuC/diJKtSWAIzfHtf5snq8LdbD1/DeFebw7iWVFrjSWA7SzmYnsTwT8pIsjUhslBxNkO+XmWDKKQKBgGCmAW0aSQDxTr1orDfB0PWUJ/sVwWiXrSxPXdd3unlKQmd29+lZk2ejKSa4HT0NwCF6n211qQEwfFm6QcuLKF22YNJZJk0GmMFz5yPGrb0qmXvUrEHEW05PAb59sDaS4cg4db3t9sYWASstQ996VljNhGUkB62Hg9IdA/z3QhKc"],
+          "active": ["true"],
+          "enabled": ["true"],
+          "priority": ["100"],
+          "algorithm": ["RS256"]
+        }
+      }
+    ]
+  },
   "clients": [
     {
       "clientId": "crash-game-client",

@@ -5,6 +5,7 @@ import { AppModule } from "./app.module";
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT;
+  app.setGlobalPrefix("games");
   await app.listen(port, "0.0.0.0");
   console.log(`Games service running on port ${port}`);
 }

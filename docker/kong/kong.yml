@@ -1,16 +1,94 @@
 _format_version: "3.0"
 
+consumers:
+  - username: keycloak-issuer
+    jwt_secrets:
+      - key: "http://keycloak:8080/realms/crash-game"
+        algorithm: RS256
+        rsa_public_key: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyOOt/Mp6/55KKQuwwjCC
+          9DXijx60ZS4xK13T/+PiT+56PtIdP36BB89RibSD6GOvt3s7GYDIrWYV6bCJrdFJ
+          YMQl/GwJRTe3mf2jCaa1sq7Qj2s91SNNw6/19wnaqjDuIah4+oAiB1gW+UwObFmf
+          TvPdT0km1lBUVEA/FHwPC4YUelrrYKOSwy27m/jUnuhgGSplwGOUkqRXjfSidsHG
+          GJgtoRRgFp3EGfTn691drAH2LwK7jmBPfqaV3MUnVh5XmoIqATvrzPzakJ4gFDZE
+          m9glIzgIEocs293q1DeXhNINbiaMZKeCKBsUkLLLulfLAWZkHlUshrzChGQY/sDT
+          fQIDAQAB
+          -----END PUBLIC KEY-----
+
 services:
   - name: games-service
     url: http://games:4001
     routes:
+      - name: games-public-current
+        methods: [GET]
+        paths:
+          - /games/rounds/current
+        strip_path: false
+
+      - name: games-health-check
+        methods: [GET]
+        paths:
+          - /games/health
+        strip_path: false
+
+      - name: games-public-history
+        methods: [GET]
+        paths:
+          - /games/rounds/history
+        strip_path: false
+
+      - name: games-public-verify
+        methods: [GET]
+        paths:
+          - ~/games/rounds/[^/]+/verify$
+        strip_path: false
+
       - name: games-routes
         paths:
           - /games
-        strip_path: true
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              header_names:
+                - authorization
+              key_claim_name: iss
+              claims_to_verify:
+                - exp
+              secret_is_base64: false
+              run_on_preflight: false
+          - name: pre-function
+            config:
+              access:
+                - |
+                  local token = kong.ctx.shared.authenticated_jwt_token
+                  if token then
+                    kong.service.request.set_header("X-User-Id",  token.sub)
+                    kong.service.request.set_header("X-Username", token.preferred_username)
+                  end
 
   - name: wallets-service
     url: http://wallets:4002
+    plugins:
+      - name: jwt
+        config:
+          header_names:
+            - authorization
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+          secret_is_base64: false
+          run_on_preflight: false
+      - name: pre-function
+        config:
+          access:
+            - |
+              local token = kong.ctx.shared.authenticated_jwt_token
+              if token then
+                kong.service.request.set_header("X-User-Id",  token.sub)
+                kong.service.request.set_header("X-Username", token.preferred_username)
+              end
     routes:
       - name: wallets-routes
         paths:
