@@ -6,6 +6,7 @@ import { validate } from "./utils/env";
 import type { Env } from "./utils/env";
 import { RoundModule } from "./round/round.module";
 import { BetModule } from "./bet/bet.module";
+import { OutboxModule } from "./outbox/outbox.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { BetModule } from "./bet/bet.module";
     }),
     RoundModule,
     BetModule,
+    OutboxModule,
   ],
 })
 export class AppModule {}
