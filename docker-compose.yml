@@ -146,8 +146,8 @@ services:
     env_file:
       - ./services/wallets/.env
     depends_on:
-      wallets-migrations:
-        condition: service_completed_successfully
+      # wallets-migrations:
+      #   condition: service_completed_successfully
       postgres:
         condition: service_healthy
       rabbitmq:
