@@ -12,3 +12,4 @@ export {
   verifyCrashPoint,
   calculateMultiplier,
 } from "./provably-fair";
+export { RoundRepository } from "./round.repository";
