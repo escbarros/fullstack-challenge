@@ -1,1 +1,1 @@
-export {};
+export { Bet, BetStatus } from './bet.entity';
