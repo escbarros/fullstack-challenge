@@ -1,7 +1,10 @@
 import "reflect-metadata";
 import { describe, it, expect } from "vitest";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
-import { InvalidTransitionError } from "@/round/domain/invalid-transition.error";
+import { RoundAlreadyStartedError } from "@/round/domain/errors/round-already-started.error";
+import { RoundCrashedError } from "@/round/domain/errors/round-crashed.error";
+import { RoundCannotCrashError } from "@/round/domain/errors/round-cannot-crash.error";
+import { RoundAlreadyCrashedError } from "@/round/domain/errors/round-already-crashed.error";
 import { RoundStateMachine } from "@/round/domain/round-state-machine";
 
 function makeRound(
@@ -85,14 +88,14 @@ describe("Round entity", () => {
       expect(round.startedAt).toBeInstanceOf(Date);
     });
 
-    it("[UT-GS-062] throws InvalidTransitionError when already ACTIVE", () => {
+    it("[UT-GS-062] throws RoundAlreadyStartedError when already ACTIVE", () => {
       const round = makeRound({ status: RoundStatus.ACTIVE });
-      expect(() => round.start()).toThrow(InvalidTransitionError);
+      expect(() => round.start()).toThrow(RoundAlreadyStartedError);
     });
 
-    it("[UT-GS-063] throws InvalidTransitionError when status is CRASHED", () => {
+    it("[UT-GS-063] throws RoundCrashedError when status is CRASHED", () => {
       const round = makeRound({ status: RoundStatus.CRASHED });
-      expect(() => round.start()).toThrow(InvalidTransitionError);
+      expect(() => round.start()).toThrow(RoundCrashedError);
     });
   });
 
@@ -109,14 +112,14 @@ describe("Round entity", () => {
       expect(round.crashedAt).toBeInstanceOf(Date);
     });
 
-    it("[UT-GS-066] throws InvalidTransitionError when status is from BETTING to CRASHED", () => {
+    it("[UT-GS-066] throws RoundCannotCrashError when status is BETTING", () => {
       const round = makeRound();
-      expect(() => round.crash()).toThrow(InvalidTransitionError);
+      expect(() => round.crash()).toThrow(RoundCannotCrashError);
     });
 
-    it("[UT-GS-067] throws InvalidTransitionError when already CRASHED", () => {
+    it("[UT-GS-067] throws RoundAlreadyCrashedError when already CRASHED", () => {
       const round = makeRound({ status: RoundStatus.CRASHED });
-      expect(() => round.crash()).toThrow(InvalidTransitionError);
+      expect(() => round.crash()).toThrow(RoundAlreadyCrashedError);
     });
   });
 

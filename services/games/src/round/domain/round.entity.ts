@@ -1,5 +1,8 @@
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
-import { InvalidTransitionError } from "./invalid-transition.error";
+import { RoundAlreadyStartedError } from "./errors/round-already-started.error";
+import { RoundCrashedError } from "./errors/round-crashed.error";
+import { RoundCannotCrashError } from "./errors/round-cannot-crash.error";
+import { RoundAlreadyCrashedError } from "./errors/round-already-crashed.error";
 
 export enum RoundStatus {
   BETTING = "betting",
@@ -60,16 +63,22 @@ export class Round {
   }
 
   start(): void {
-    if (this.status !== RoundStatus.BETTING) {
-      throw new InvalidTransitionError(this.status, RoundStatus.ACTIVE);
+    if (this.status === RoundStatus.ACTIVE) {
+      throw new RoundAlreadyStartedError(this.status);
+    }
+    if (this.status === RoundStatus.CRASHED) {
+      throw new RoundCrashedError(this.status);
     }
     this.status = RoundStatus.ACTIVE;
     this.startedAt = new Date();
   }
 
   crash(): void {
-    if (this.status !== RoundStatus.ACTIVE) {
-      throw new InvalidTransitionError(this.status, RoundStatus.CRASHED);
+    if (this.status === RoundStatus.BETTING) {
+      throw new RoundCannotCrashError(this.status);
+    }
+    if (this.status === RoundStatus.CRASHED) {
+      throw new RoundAlreadyCrashedError(this.status);
     }
     this.status = RoundStatus.CRASHED;
     this.crashedAt = new Date();
