@@ -31,4 +31,7 @@ yarn-error.log*
 
 # Test coverage
 coverage/
+
+
 docs
+Makefile

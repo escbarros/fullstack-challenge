@@ -8,18 +8,36 @@
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "test": "bun test tests/unit",
-    "test:e2e": "bun test tests/e2e"
+    "test:e2e": "bun test tests/e2e",
+    "migration:generate": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down",
+    "migration:status": "mikro-orm migration:list"
   },
   "dependencies": {
+    "@mikro-orm/core": "^6",
+    "@mikro-orm/migrations": "^6",
+    "@mikro-orm/nestjs": "^6",
+    "@mikro-orm/postgresql": "^6",
     "@nestjs/common": "^11.1.17",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.17",
+    "@nestjs/microservices": "^11",
     "@nestjs/platform-express": "^11.1.17",
+    "@nestjs/platform-socket.io": "^11",
+    "@nestjs/websockets": "^11",
+    "amqp-connection-manager": "^4",
+    "amqplib": "^0.10",
+    "class-transformer": "^0.5",
+    "class-validator": "^0.14",
+    "pg": "^8",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@mikro-orm/cli": "^6",
+    "@types/amqplib": "^0.10",
     "bun-types": "latest",
     "typescript": "^5.8.3"
   }
