@@ -95,6 +95,21 @@ services:
         condition: service_healthy
 
   # ---------------------------------------------------------------------------
+  # Games Migrations
+  # ---------------------------------------------------------------------------
+  games-migrations:
+    build:
+      context: ./services/games
+      dockerfile: Dockerfile
+    command: bun run migration:up
+    environment:
+      DATABASE_URL: postgresql://admin:admin@postgres:5432/games
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
   # Games Service
   # ---------------------------------------------------------------------------
   games:
@@ -106,6 +121,8 @@ services:
     env_file:
       - ./services/games/.env
     depends_on:
+      games-migrations:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       rabbitmq:
@@ -129,6 +146,8 @@ services:
     env_file:
       - ./services/wallets/.env
     depends_on:
+      wallets-migrations:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       rabbitmq:
