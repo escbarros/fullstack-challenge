@@ -22,7 +22,7 @@ import { OutboxModule } from "./outbox/outbox.module";
             path: "./src/migrations",
             glob: "!(*.d).{js,ts}",
           },
-          debug: config.get("NODE_ENV") !== "production",
+          debug: config.get("NODE_ENV") == "development",
         }),
       inject: [ConfigService],
     }),

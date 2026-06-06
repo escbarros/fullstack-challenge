@@ -26,10 +26,10 @@ services:
           - /games/rounds/current
         strip_path: false
 
-      - name: games-health-check
+      - name: games-docs
         methods: [GET]
         paths:
-          - /games/health
+          - /games/docs
         strip_path: false
 
       - name: games-public-history

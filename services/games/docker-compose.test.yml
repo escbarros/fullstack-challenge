@@ -1,0 +1,14 @@
+services:
+  postgres-test:
+    image: postgres:18.3-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: games_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d games_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
