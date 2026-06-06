@@ -1,1 +1,1 @@
-export {};
+export { MikroOrmBetRepository } from "./mikroorm-bet.repository";

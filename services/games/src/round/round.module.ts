@@ -6,18 +6,21 @@ import { MikroOrmRoundRepository } from "./infrastructure/mikroorm-round.reposit
 import { GameGateway } from "./presentation/game.gateway";
 import { StartRoundUseCase } from "./application/start-round.use-case";
 import { StartActivePhaseUseCase } from "./application/start-active-phase.use-case";
+import { CrashRoundUseCase } from "./application/crash-round.use-case";
+import { BetModule } from "../bet/bet.module";
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Round])],
+  imports: [MikroOrmModule.forFeature([Round]), BetModule],
   providers: [
     GameGateway,
     StartRoundUseCase,
     StartActivePhaseUseCase,
+    CrashRoundUseCase,
     {
       provide: RoundRepository,
       useClass: MikroOrmRoundRepository,
     },
   ],
-  exports: [RoundRepository, GameGateway, StartRoundUseCase, StartActivePhaseUseCase],
+  exports: [RoundRepository, GameGateway, StartRoundUseCase, StartActivePhaseUseCase, CrashRoundUseCase],
 })
 export class RoundModule {}
