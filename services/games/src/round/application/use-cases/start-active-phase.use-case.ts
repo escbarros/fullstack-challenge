@@ -11,6 +11,7 @@ export class StartActivePhaseUseCase {
     private readonly gameGateway: GameGateway,
   ) {}
 
+  // TODO: accept round as a parameter
   async execute(): Promise<Round | null> {
     const round = await this.roundRepository.findCurrent();
 

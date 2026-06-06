@@ -4,6 +4,7 @@ import { Logger } from "@nestjs/common";
 import { RoundScheduler } from "@/round/application/services/round-scheduler.service";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
+import { StartRoundUseCase } from "@/round/application/use-cases/start-round.use-case";
 import { StartActivePhaseUseCase } from "@/round/application/use-cases/start-active-phase.use-case";
 import { CrashTicker } from "@/round/application/services/crash-ticker.service";
 
@@ -41,15 +42,23 @@ function makeCrashTickerMock(): CrashTicker {
   } as unknown as CrashTicker;
 }
 
+function makeStartRoundUseCase(result: Round | null = null): StartRoundUseCase {
+  return {
+    execute: vi.fn().mockResolvedValue(result),
+  } as unknown as StartRoundUseCase;
+}
+
 function makeScheduler({
   round = null as Round | null,
+  newRound = null as Round | null,
   activatedRound = null as Round | null,
 } = {}) {
   const roundRepository = makeRoundRepository(round);
+  const startRoundUseCase = makeStartRoundUseCase(newRound);
   const startActivePhaseUseCase = makeStartActivePhaseUseCase(activatedRound);
   const crashTicker = makeCrashTickerMock();
-  const scheduler = new RoundScheduler(roundRepository, startActivePhaseUseCase, crashTicker);
-  return { scheduler, roundRepository, startActivePhaseUseCase, crashTicker };
+  const scheduler = new RoundScheduler(roundRepository, startRoundUseCase, startActivePhaseUseCase, crashTicker);
+  return { scheduler, roundRepository, startRoundUseCase, startActivePhaseUseCase, crashTicker };
 }
 
 describe("RoundScheduler", () => {
@@ -61,12 +70,13 @@ describe("RoundScheduler", () => {
     vi.useRealTimers();
   });
 
-  it("[UT-GS-116] onModuleInit: no current round —> does nothing", async () => {
-    const { scheduler, crashTicker, startActivePhaseUseCase } = makeScheduler({ round: null });
+  it("[UT-GS-116] onModuleInit: no current round —> creates first round and schedules it", async () => {
+    const firstRound = makeRound({ bettingEndsAt: new Date(Date.now() + 1_000) });
+    const { scheduler, startRoundUseCase, startActivePhaseUseCase } = makeScheduler({ newRound: firstRound });
     await scheduler.onModuleInit();
-    expect(crashTicker.start).not.toHaveBeenCalled();
-    await vi.advanceTimersByTimeAsync(20_000);
-    expect(startActivePhaseUseCase.execute).not.toHaveBeenCalled();
+    expect(startRoundUseCase.execute).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(1_500);
+    expect(startActivePhaseUseCase.execute).toHaveBeenCalledOnce();
   });
 
   it("[UT-GS-117] onModuleInit: BETTING round —> schedules the active phase transition", async () => {

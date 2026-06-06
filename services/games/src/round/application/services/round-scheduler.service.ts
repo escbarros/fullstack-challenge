@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Round, RoundRepository, RoundStatus } from "../../domain";
+import { StartRoundUseCase } from "../use-cases/start-round.use-case";
 import { StartActivePhaseUseCase } from "../use-cases/start-active-phase.use-case";
 import { CrashTicker } from "./crash-ticker.service";
 
@@ -10,6 +11,7 @@ export class RoundScheduler implements OnModuleInit {
 
   constructor(
     private readonly roundRepository: RoundRepository,
+    private readonly startRoundUseCase: StartRoundUseCase,
     private readonly startActivePhaseUseCase: StartActivePhaseUseCase,
     @Inject(forwardRef(() => CrashTicker))
     private readonly crashTicker: CrashTicker,
@@ -17,7 +19,11 @@ export class RoundScheduler implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     const round = await this.roundRepository.findCurrent();
-    if (!round) return;
+    if (!round) {
+      const newRound = await this.startRoundUseCase.execute();
+      this.schedule(newRound);
+      return;
+    }
 
     if (round.status === RoundStatus.BETTING) {
       this.schedule(round);
