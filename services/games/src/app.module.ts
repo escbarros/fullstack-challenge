@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
-import { defineConfig } from "@mikro-orm/postgresql";
+import { defineConfig, PostgreSqlDriver } from "@mikro-orm/postgresql";
 import { validate } from "./utils/env";
 import type { Env } from "./utils/env";
 import { RoundModule } from "./round/round.module";
@@ -12,6 +12,7 @@ import { OutboxModule } from "./outbox/outbox.module";
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate }),
     MikroOrmModule.forRootAsync({
+      driver: PostgreSqlDriver,
       useFactory: (config: ConfigService<Env, true>) =>
         defineConfig({
           clientUrl: config.get("DATABASE_URL"),

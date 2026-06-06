@@ -1,9 +1,11 @@
-import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { CreateRequestContext } from "@mikro-orm/core";
+import { EntityManager } from "@mikro-orm/postgresql";
 import { Round, RoundStateMachine, calculateMultiplier } from "../../domain";
 import { GameGateway } from "../../presentation/game.gateway";
 import { CrashRoundUseCase } from "../use-cases/crash-round.use-case";
-import { RoundScheduler } from "./round-scheduler.service";
+import { RoundLifecycleBus } from "./round-lifecycle.bus";
 import { Env } from "../../../utils/env";
 
 @Injectable()
@@ -14,12 +16,15 @@ export class CrashTicker {
   private lastTickEmittedAt = 0;
 
   constructor(
+    // Required by @CreateRequestContext to fork a context for timer-driven work.
+    private readonly em: EntityManager,
     private readonly crashRoundUseCase: CrashRoundUseCase,
-    @Inject(forwardRef(() => RoundScheduler))
-    private readonly roundScheduler: RoundScheduler,
+    private readonly lifecycleBus: RoundLifecycleBus,
     private readonly gameGateway: GameGateway,
     private readonly config: ConfigService<Env, true>,
-  ) {}
+  ) {
+    this.lifecycleBus.onActivePhaseStarted((round) => this.start(round));
+  }
 
   start(round: Round): void {
     if (this.intervalHandle) {
@@ -53,14 +58,7 @@ export class CrashTicker {
     if (RoundStateMachine.isCrashReached(this.round, multiplier)) {
       const roundId = this.round.id;
       this.stop();
-      try {
-        const nextRound = await this.crashRoundUseCase.execute(roundId);
-        if (nextRound) {
-          this.roundScheduler.schedule(nextRound);
-        }
-      } catch (err) {
-        this.logger.error("failed to crash round", err);
-      }
+      await this.crashRound(roundId);
       return;
     }
 
@@ -71,6 +69,24 @@ export class CrashTicker {
         elapsedMs: now - this.round.startedAt.getTime(),
       });
       this.lastTickEmittedAt = now;
+    }
+  }
+
+  // Runs from the tick interval (outside any request), so it needs its own
+  // ORM context — the crash use case reads/writes the round and its bets.
+  @CreateRequestContext()
+  private async crashRound(roundId: string): Promise<void> {
+    try {
+      // Explicit transaction so that findWithLock's SELECT FOR UPDATE
+      // acquires the lock before the crash/cashout race is decided.
+      const nextRound = await this.em.transactional(() =>
+        this.crashRoundUseCase.execute(roundId),
+      );
+      if (nextRound) {
+        this.lifecycleBus.emitBettingRoundCreated(nextRound);
+      }
+    } catch (err) {
+      this.logger.error("failed to crash round", err);
     }
   }
 }

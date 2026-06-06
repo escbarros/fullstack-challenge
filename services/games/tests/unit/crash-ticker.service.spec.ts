@@ -2,11 +2,12 @@ import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { EntityManager } from "@mikro-orm/postgresql";
 import { CrashTicker } from "@/round/application/services/crash-ticker.service";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
 import { GameGateway } from "@/round/presentation/game.gateway";
 import { CrashRoundUseCase } from "@/round/application/use-cases/crash-round.use-case";
-import { RoundScheduler } from "@/round/application/services/round-scheduler.service";
+import { RoundLifecycleBus } from "@/round/application/services/round-lifecycle.bus";
 import { Env } from "@/utils/env";
 
 function makeActiveRound(overrides: Omit<Partial<Round>, "crashPoint"> = {}): Round {
@@ -48,16 +49,18 @@ function makeConfig({ tickIntervalMs = 100, growthRate = 0.06 } = {}): ConfigSer
   } as unknown as ConfigService<Env, true>;
 }
 
+function makeEm(): EntityManager {
+  const em = Object.create(EntityManager.prototype) as EntityManager;
+  (em as any).fork = vi.fn().mockReturnValue(em);
+  (em as any).transactional = vi.fn().mockImplementation((fn: () => Promise<unknown>) => fn());
+  (em as any).name = "default";
+  return em;
+}
+
 function makeCrashRoundUseCase(nextRound: Round | null = null): CrashRoundUseCase {
   return {
     execute: vi.fn().mockResolvedValue(nextRound),
   } as unknown as CrashRoundUseCase;
-}
-
-function makeRoundSchedulerMock(): RoundScheduler {
-  return {
-    schedule: vi.fn(),
-  } as unknown as RoundScheduler;
 }
 
 function makeGateway(): GameGateway {
@@ -72,11 +75,13 @@ function makeGateway(): GameGateway {
 }
 
 function makeTicker({ nextRound = null as Round | null, config = makeConfig() } = {}) {
+  const em = makeEm();
   const crashRoundUseCase = makeCrashRoundUseCase(nextRound);
-  const roundScheduler = makeRoundSchedulerMock();
+  const lifecycleBus = new RoundLifecycleBus();
+  vi.spyOn(lifecycleBus, "emitBettingRoundCreated");
   const gateway = makeGateway();
-  const ticker = new CrashTicker(crashRoundUseCase, roundScheduler, gateway, config);
-  return { ticker, crashRoundUseCase, roundScheduler, gateway };
+  const ticker = new CrashTicker(em, crashRoundUseCase, lifecycleBus, gateway, config);
+  return { ticker, crashRoundUseCase, lifecycleBus, gateway };
 }
 
 describe("CrashTicker", () => {
@@ -170,7 +175,7 @@ describe("CrashTicker", () => {
     expect(crashRoundUseCase.execute).toHaveBeenCalledOnce();
   });
 
-  it("[UT-GS-134] tick: crash reached, nextRound returned —> calls roundScheduler.schedule(nextRound)", async () => {
+  it("[UT-GS-134] tick: crash reached, nextRound returned —> emits betting-round-created(nextRound)", async () => {
     const nextRound = Round.create({
       crashPoint: "2.50",
       seedHash: "h",
@@ -179,31 +184,31 @@ describe("CrashTicker", () => {
       bettingEndsAt: new Date(Date.now() + 10_000),
     });
     const round = makeCrashBoundRound();
-    const { ticker, roundScheduler } = makeTicker({ nextRound });
+    const { ticker, lifecycleBus } = makeTicker({ nextRound });
     ticker.start(round);
     await vi.advanceTimersByTimeAsync(100);
-    expect(roundScheduler.schedule).toHaveBeenCalledOnce();
-    expect(roundScheduler.schedule).toHaveBeenCalledWith(nextRound);
+    expect(lifecycleBus.emitBettingRoundCreated).toHaveBeenCalledOnce();
+    expect(lifecycleBus.emitBettingRoundCreated).toHaveBeenCalledWith(nextRound);
   });
 
-  it("[UT-GS-135] tick: crash reached, nextRound is null —> does NOT call roundScheduler.schedule", async () => {
+  it("[UT-GS-135] tick: crash reached, nextRound is null —> does NOT emit betting-round-created", async () => {
     const round = makeCrashBoundRound();
-    const { ticker, roundScheduler } = makeTicker({ nextRound: null });
+    const { ticker, lifecycleBus } = makeTicker({ nextRound: null });
     ticker.start(round);
     await vi.advanceTimersByTimeAsync(100);
-    expect(roundScheduler.schedule).not.toHaveBeenCalled();
+    expect(lifecycleBus.emitBettingRoundCreated).not.toHaveBeenCalled();
   });
 
   it("[UT-GS-136] tick: crashRoundUseCase throws —> error is caught and logged, ticker remains stopped", async () => {
     const loggerSpy = vi.spyOn(Logger.prototype, "error");
     const round = makeCrashBoundRound();
-    const { ticker, crashRoundUseCase, roundScheduler } = makeTicker();
+    const { ticker, crashRoundUseCase, lifecycleBus } = makeTicker();
     vi.mocked(crashRoundUseCase.execute).mockRejectedValue(new Error("lock timeout"));
     ticker.start(round);
     await vi.advanceTimersByTimeAsync(100);
     expect(loggerSpy).toHaveBeenCalledWith("failed to crash round", expect.any(Error));
     await vi.advanceTimersByTimeAsync(500);
     expect(crashRoundUseCase.execute).toHaveBeenCalledOnce();
-    expect(roundScheduler.schedule).not.toHaveBeenCalled();
+    expect(lifecycleBus.emitBettingRoundCreated).not.toHaveBeenCalled();
   });
 });

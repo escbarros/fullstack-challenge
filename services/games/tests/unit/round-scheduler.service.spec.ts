@@ -1,12 +1,13 @@
 import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Logger } from "@nestjs/common";
+import { EntityManager } from "@mikro-orm/postgresql";
 import { RoundScheduler } from "@/round/application/services/round-scheduler.service";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
 import { StartRoundUseCase } from "@/round/application/use-cases/start-round.use-case";
 import { StartActivePhaseUseCase } from "@/round/application/use-cases/start-active-phase.use-case";
-import { CrashTicker } from "@/round/application/services/crash-ticker.service";
+import { RoundLifecycleBus } from "@/round/application/services/round-lifecycle.bus";
 
 function makeRound(overrides: Partial<Round> = {}): Round {
   const round = Round.create({
@@ -35,11 +36,11 @@ function makeStartActivePhaseUseCase(result: Round | null = null): StartActivePh
   } as unknown as StartActivePhaseUseCase;
 }
 
-function makeCrashTickerMock(): CrashTicker {
-  return {
-    start: vi.fn(),
-    stop: vi.fn(),
-  } as unknown as CrashTicker;
+function makeEm(): EntityManager {
+  const em = Object.create(EntityManager.prototype) as EntityManager;
+  (em as any).fork = vi.fn().mockReturnValue(em);
+  (em as any).name = "default";
+  return em;
 }
 
 function makeStartRoundUseCase(result: Round | null = null): StartRoundUseCase {
@@ -53,12 +54,14 @@ function makeScheduler({
   newRound = null as Round | null,
   activatedRound = null as Round | null,
 } = {}) {
+  const em = makeEm();
   const roundRepository = makeRoundRepository(round);
   const startRoundUseCase = makeStartRoundUseCase(newRound);
   const startActivePhaseUseCase = makeStartActivePhaseUseCase(activatedRound);
-  const crashTicker = makeCrashTickerMock();
-  const scheduler = new RoundScheduler(roundRepository, startRoundUseCase, startActivePhaseUseCase, crashTicker);
-  return { scheduler, roundRepository, startRoundUseCase, startActivePhaseUseCase, crashTicker };
+  const lifecycleBus = new RoundLifecycleBus();
+  vi.spyOn(lifecycleBus, "emitActivePhaseStarted");
+  const scheduler = new RoundScheduler(em, roundRepository, startRoundUseCase, startActivePhaseUseCase, lifecycleBus);
+  return { scheduler, roundRepository, startRoundUseCase, startActivePhaseUseCase, lifecycleBus };
 }
 
 describe("RoundScheduler", () => {
@@ -81,26 +84,26 @@ describe("RoundScheduler", () => {
 
   it("[UT-GS-117] onModuleInit: BETTING round —> schedules the active phase transition", async () => {
     const round = makeRound({ status: RoundStatus.BETTING, bettingEndsAt: new Date(Date.now() + 1_000) });
-    const { scheduler, startActivePhaseUseCase, crashTicker } = makeScheduler({ round, activatedRound: null });
+    const { scheduler, startActivePhaseUseCase, lifecycleBus } = makeScheduler({ round, activatedRound: null });
     await scheduler.onModuleInit();
-    expect(crashTicker.start).not.toHaveBeenCalled();
+    expect(lifecycleBus.emitActivePhaseStarted).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(1_500);
     expect(startActivePhaseUseCase.execute).toHaveBeenCalledOnce();
   });
 
-  it("[UT-GS-118] onModuleInit: ACTIVE round —> starts the crash ticker immediately", async () => {
+  it("[UT-GS-118] onModuleInit: ACTIVE round —> signals active phase immediately", async () => {
     const round = makeRound({ status: RoundStatus.ACTIVE });
-    const { scheduler, crashTicker } = makeScheduler({ round });
+    const { scheduler, lifecycleBus } = makeScheduler({ round });
     await scheduler.onModuleInit();
-    expect(crashTicker.start).toHaveBeenCalledOnce();
-    expect(crashTicker.start).toHaveBeenCalledWith(round);
+    expect(lifecycleBus.emitActivePhaseStarted).toHaveBeenCalledOnce();
+    expect(lifecycleBus.emitActivePhaseStarted).toHaveBeenCalledWith(round);
   });
 
   it("[UT-GS-119] onModuleInit: CRASHED round —> does nothing", async () => {
     const round = makeRound({ status: RoundStatus.CRASHED });
-    const { scheduler, crashTicker, startActivePhaseUseCase } = makeScheduler({ round });
+    const { scheduler, lifecycleBus, startActivePhaseUseCase } = makeScheduler({ round });
     await scheduler.onModuleInit();
-    expect(crashTicker.start).not.toHaveBeenCalled();
+    expect(lifecycleBus.emitActivePhaseStarted).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(20_000);
     expect(startActivePhaseUseCase.execute).not.toHaveBeenCalled();
   });
@@ -114,22 +117,22 @@ describe("RoundScheduler", () => {
     expect(startActivePhaseUseCase.execute).toHaveBeenCalledOnce();
   });
 
-  it("[UT-GS-121] schedule: when execute() returns a round, starts crash ticker", async () => {
+  it("[UT-GS-121] schedule: when execute() returns a round, signals active phase", async () => {
     const activatedRound = makeRound({ status: RoundStatus.ACTIVE });
     const bettingRound = makeRound({ bettingEndsAt: new Date(Date.now() + 500) });
-    const { scheduler, crashTicker } = makeScheduler({ activatedRound });
+    const { scheduler, lifecycleBus } = makeScheduler({ activatedRound });
     scheduler.schedule(bettingRound);
     await vi.advanceTimersByTimeAsync(600);
-    expect(crashTicker.start).toHaveBeenCalledOnce();
-    expect(crashTicker.start).toHaveBeenCalledWith(activatedRound);
+    expect(lifecycleBus.emitActivePhaseStarted).toHaveBeenCalledOnce();
+    expect(lifecycleBus.emitActivePhaseStarted).toHaveBeenCalledWith(activatedRound);
   });
 
-  it("[UT-GS-122] schedule: when execute() returns null, does NOT start crash ticker", async () => {
+  it("[UT-GS-122] schedule: when execute() returns null, does NOT signal active phase", async () => {
     const bettingRound = makeRound({ bettingEndsAt: new Date(Date.now() + 500) });
-    const { scheduler, crashTicker } = makeScheduler({ activatedRound: null });
+    const { scheduler, lifecycleBus } = makeScheduler({ activatedRound: null });
     scheduler.schedule(bettingRound);
     await vi.advanceTimersByTimeAsync(600);
-    expect(crashTicker.start).not.toHaveBeenCalled();
+    expect(lifecycleBus.emitActivePhaseStarted).not.toHaveBeenCalled();
   });
 
   it("[UT-GS-123] schedule: execute() throws —> error is caught and logged, does not propagate", async () => {

@@ -9,7 +9,7 @@ export class MikroOrmRoundRepository implements RoundRepository {
   constructor(private readonly em: EntityManager) {}
 
   async save(round: Round): Promise<void> {
-    this.em.persist(round);
+    await this.em.persist(round).flush();
   }
 
   async findCurrent(): Promise<Round | null> {

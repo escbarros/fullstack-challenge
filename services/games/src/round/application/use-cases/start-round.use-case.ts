@@ -37,7 +37,6 @@ export class StartRoundUseCase {
       crashPoint: String(crashPoint),
       bettingEndsAt,
     });
-
     await this.roundRepository.save(round);
 
     this.gameGateway.emitRoundBetting({
