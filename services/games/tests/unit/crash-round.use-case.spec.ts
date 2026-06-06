@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { CrashRoundUseCase } from "@/round/application/crash-round.use-case";
+import { CrashRoundUseCase } from "@/round/application/use-cases/crash-round.use-case";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
 import { RoundCannotCrashError } from "@/round/domain/errors/round-cannot-crash.error";
@@ -8,7 +8,7 @@ import { RoundAlreadyCrashedError } from "@/round/domain/errors/round-already-cr
 import { BetRepository } from "@/bet/domain/bet.repository";
 import { Bet, BetStatus } from "@/bet/domain/bet.entity";
 import { GameGateway } from "@/round/presentation/game.gateway";
-import { StartRoundUseCase } from "@/round/application/start-round.use-case";
+import { StartRoundUseCase } from "@/round/application/use-cases/start-round.use-case";
 
 const ROUND_ID = "11111111-1111-1111-1111-111111111111";
 

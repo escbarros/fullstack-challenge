@@ -4,11 +4,7 @@ import { Round } from "./domain/round.entity";
 import { RoundRepository } from "./domain/round.repository";
 import { MikroOrmRoundRepository } from "./infrastructure/mikroorm-round.repository";
 import { GameGateway } from "./presentation/game.gateway";
-import { StartRoundUseCase } from "./application/start-round.use-case";
-import { StartActivePhaseUseCase } from "./application/start-active-phase.use-case";
-import { CrashRoundUseCase } from "./application/crash-round.use-case";
-import { RoundScheduler } from "./application/round-scheduler.service";
-import { CrashTicker } from "./application/crash-ticker.service";
+import { StartRoundUseCase, StartActivePhaseUseCase, CrashRoundUseCase, RoundScheduler, CrashTicker } from "./application";
 import { BetModule } from "../bet/bet.module";
 
 @Module({

@@ -2,11 +2,11 @@ import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { CrashTicker } from "@/round/application/crash-ticker.service";
+import { CrashTicker } from "@/round/application/services/crash-ticker.service";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
 import { GameGateway } from "@/round/presentation/game.gateway";
-import { CrashRoundUseCase } from "@/round/application/crash-round.use-case";
-import { RoundScheduler } from "@/round/application/round-scheduler.service";
+import { CrashRoundUseCase } from "@/round/application/use-cases/crash-round.use-case";
+import { RoundScheduler } from "@/round/application/services/round-scheduler.service";
 import { Env } from "@/utils/env";
 
 function makeActiveRound(overrides: Omit<Partial<Round>, "crashPoint"> = {}): Round {

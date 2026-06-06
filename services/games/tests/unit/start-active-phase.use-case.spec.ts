@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { StartActivePhaseUseCase } from "@/round/application/start-active-phase.use-case";
+import { StartActivePhaseUseCase } from "@/round/application/use-cases/start-active-phase.use-case";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
 import { RoundAlreadyStartedError } from "@/round/domain/errors/round-already-started.error";

@@ -1,10 +1,10 @@
 import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Round, RoundStateMachine, calculateMultiplier } from "../domain";
-import { GameGateway } from "../presentation/game.gateway";
-import { CrashRoundUseCase } from "./crash-round.use-case";
+import { Round, RoundStateMachine, calculateMultiplier } from "../../domain";
+import { GameGateway } from "../../presentation/game.gateway";
+import { CrashRoundUseCase } from "../use-cases/crash-round.use-case";
 import { RoundScheduler } from "./round-scheduler.service";
-import { Env } from "../../utils/env";
+import { Env } from "../../../utils/env";
 
 @Injectable()
 export class CrashTicker {

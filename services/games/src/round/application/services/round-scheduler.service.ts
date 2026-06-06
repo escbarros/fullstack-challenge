@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { Round, RoundRepository, RoundStatus } from "../domain";
-import { StartActivePhaseUseCase } from "./start-active-phase.use-case";
+import { Round, RoundRepository, RoundStatus } from "../../domain";
+import { StartActivePhaseUseCase } from "../use-cases/start-active-phase.use-case";
 import { CrashTicker } from "./crash-ticker.service";
 
 @Injectable()

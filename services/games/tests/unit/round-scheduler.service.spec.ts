@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Logger } from "@nestjs/common";
-import { RoundScheduler } from "@/round/application/round-scheduler.service";
+import { RoundScheduler } from "@/round/application/services/round-scheduler.service";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { Round, RoundStatus } from "@/round/domain/round.entity";
-import { StartActivePhaseUseCase } from "@/round/application/start-active-phase.use-case";
-import { CrashTicker } from "@/round/application/crash-ticker.service";
+import { StartActivePhaseUseCase } from "@/round/application/use-cases/start-active-phase.use-case";
+import { CrashTicker } from "@/round/application/services/crash-ticker.service";
 
 function makeRound(overrides: Partial<Round> = {}): Round {
   const round = Round.create({

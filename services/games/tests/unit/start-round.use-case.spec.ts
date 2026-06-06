@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { StartRoundUseCase } from "@/round/application/start-round.use-case";
+import { StartRoundUseCase } from "@/round/application/use-cases/start-round.use-case";
 import { RoundRepository } from "@/round/domain/round.repository";
 import { RoundStatus } from "@/round/domain/round.entity";
 import { GameGateway } from "@/round/presentation/game.gateway";

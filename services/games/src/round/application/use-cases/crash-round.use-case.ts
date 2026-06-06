@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { Round, RoundRepository } from "../domain";
-import { BetRepository } from "../../bet/domain/bet.repository";
-import { BetStatus } from "../../bet/domain/bet.entity";
-import { GameGateway } from "../presentation/game.gateway";
+import { Round, RoundRepository } from "../../domain";
+import { BetRepository } from "../../../bet/domain/bet.repository";
+import { BetStatus } from "../../../bet/domain/bet.entity";
+import { GameGateway } from "../../presentation/game.gateway";
 import { StartRoundUseCase } from "./start-round.use-case";
 
 @Injectable()

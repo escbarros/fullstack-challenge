@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Round, RoundRepository } from "../domain";
-import { GameGateway } from "../presentation/game.gateway";
+import { Round, RoundRepository } from "../../domain";
+import { GameGateway } from "../../presentation/game.gateway";
 
 @Injectable()
 export class StartActivePhaseUseCase {
