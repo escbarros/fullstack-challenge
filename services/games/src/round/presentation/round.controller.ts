@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
 import { GetCurrentRoundUseCase } from "../application/use-cases/get-current-round.use-case";
-import { ApiResponseDto } from "../../common/api-response.dto";
+import { ApiResponseDto } from "../../utils/api-response.dto";
 import { RoundResponseDto } from "./dto/round-response.dto";
 
 @Controller("rounds")
