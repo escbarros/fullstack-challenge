@@ -61,7 +61,7 @@ describe("StartRoundUseCase", () => {
 
   it("[UT-GS-093] returned round carries all provably fair fields", async () => {
     const round = await useCase.execute();
-    console.log(round.crashPoint)
+
     expect(round.seedHash).toBeTypeOf("string");
     expect(round.seedHash.length).toBeGreaterThan(0);
     expect(round.serverSeed).toBeTypeOf("string");
