@@ -72,13 +72,9 @@ export class CrashTicker {
     }
   }
 
-  // Runs from the tick interval (outside any request), so it needs its own
-  // ORM context — the crash use case reads/writes the round and its bets.
   @CreateRequestContext()
   private async crashRound(roundId: string): Promise<void> {
     try {
-      // Explicit transaction so that findWithLock's SELECT FOR UPDATE
-      // acquires the lock before the crash/cashout race is decided.
       const nextRound = await this.em.transactional(() =>
         this.crashRoundUseCase.execute(roundId),
       );
