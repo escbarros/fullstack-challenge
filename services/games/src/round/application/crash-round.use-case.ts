@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { RoundRepository } from "../domain";
+import { Round, RoundRepository } from "../domain";
 import { BetRepository } from "../../bet/domain/bet.repository";
 import { BetStatus } from "../../bet/domain/bet.entity";
 import { GameGateway } from "../presentation/game.gateway";
@@ -14,11 +14,11 @@ export class CrashRoundUseCase {
     private readonly startRoundUseCase: StartRoundUseCase,
   ) {}
 
-  async execute(roundId: string): Promise<void> {
+  async execute(roundId: string): Promise<Round | null> {
     const round = await this.roundRepository.findWithLock(roundId);
 
     if (!round) {
-      return;
+      return null;
     }
 
     round.crash();
@@ -42,6 +42,6 @@ export class CrashRoundUseCase {
       seedHash: round.seedHash,
     });
 
-    await this.startRoundUseCase.execute();
+    return this.startRoundUseCase.execute();
   }
 }

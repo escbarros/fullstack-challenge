@@ -1,20 +1,22 @@
-import { Injectable } from "@nestjs/common";
-import { RoundRepository } from "../domain";
+import { Injectable, Logger } from "@nestjs/common";
+import { Round, RoundRepository } from "../domain";
 import { GameGateway } from "../presentation/game.gateway";
 
 @Injectable()
 export class StartActivePhaseUseCase {
+  private readonly logger = new Logger(StartActivePhaseUseCase.name);
+
   constructor(
     private readonly roundRepository: RoundRepository,
     private readonly gameGateway: GameGateway,
   ) {}
 
-  async execute(): Promise<void> {
+  async execute(): Promise<Round | null> {
     const round = await this.roundRepository.findCurrent();
 
     if (!round) {
-      console.log("betting round not found")
-      return;
+      this.logger.warn("no current round in BETTING status");
+      return null;
     }
 
     round.start();
@@ -25,5 +27,7 @@ export class StartActivePhaseUseCase {
       roundId: round.id,
       startedAt: round.startedAt!,
     });
+
+    return round;
   }
 }

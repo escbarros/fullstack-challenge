@@ -9,6 +9,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().startsWith("postgresql://"),
   RABBITMQ_URL: z.string().url().startsWith("amqp://"),
   BETTING_DURATION_MS: z.coerce.number().int().min(1).default(10_000),
+  TICK_INTERVAL_MS: z.coerce.number().int().min(50).default(100),
+  GROWTH_RATE: z.coerce.number().positive().default(0.06),
 });
 
 export type Env = z.infer<typeof envSchema>;
