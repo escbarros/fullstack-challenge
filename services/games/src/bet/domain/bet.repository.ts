@@ -3,6 +3,7 @@ import { Outbox } from "../../outbox/domain/outbox.entity";
 
 export abstract class BetRepository {
   abstract findActiveByRoundId(roundId: string): Promise<Bet[]>;
+  abstract findActiveByRoundAndPlayer(roundId: string, playerId: string): Promise<Bet | null>;
   abstract findById(id: string): Promise<Bet | null>;
   abstract findByPlayerAndRound(playerId: string, roundId: string): Promise<Bet[]>;
   abstract save(bet: Bet): Promise<void>;

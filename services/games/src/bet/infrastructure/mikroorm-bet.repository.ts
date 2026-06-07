@@ -15,6 +15,14 @@ export class MikroOrmBetRepository implements BetRepository {
     });
   }
 
+  async findActiveByRoundAndPlayer(roundId: string, playerId: string): Promise<Bet | null> {
+    return this.em.findOne(Bet, {
+      round: roundId,
+      playerId: playerId,
+      status: { $in: [BetStatus.CONFIRMED, BetStatus.PENDING] },
+    });
+  }
+
   async findById(id: string): Promise<Bet | null> {
     return this.em.findOne(Bet, { id }, { populate: ["round"] });
   }

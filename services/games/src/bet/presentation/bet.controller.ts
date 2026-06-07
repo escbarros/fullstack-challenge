@@ -44,13 +44,13 @@ export class BetController {
     return ApiResponseDto.ok(result);
   }
 
-  @Post(":betId/cashout")
+  @Post(":roundId/cashout")
   @HttpCode(HttpStatus.OK)
   async cashOut(
     @PlayerId() playerId: string,
-    @Param("betId", ParseUUIDPipe) betId: string,
+    @Param("roundId", ParseUUIDPipe) roundId: string,
   ): Promise<ApiResponseDto<object, null, null>> {
-    const result = await this.cashout.execute({ betId, playerId });
+    const result = await this.cashout.execute({ roundId, playerId });
     return ApiResponseDto.ok(result);
   }
 }

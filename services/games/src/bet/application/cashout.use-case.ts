@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { ConflictException } from "@nestjs/common";
@@ -14,12 +15,12 @@ import { GameGateway } from "../../round/presentation/game.gateway";
 import type { Env } from "../../utils/env";
 
 interface CashoutParams {
-  betId: string;
+  roundId: string;
   playerId: string;
 }
 
 interface CashoutResult {
-  betId: string;
+  roundId: string;
   cashoutMultiplier: string;
   payoutCents: string;
   status: string;
@@ -27,6 +28,7 @@ interface CashoutResult {
 
 @Injectable()
 export class CashoutUseCase {
+  private readonly logger = new Logger(CashoutUseCase.name);
   private readonly growthRate: number;
 
   constructor(
@@ -39,16 +41,16 @@ export class CashoutUseCase {
   }
 
   async execute(params: CashoutParams): Promise<CashoutResult> {
-    const { betId, playerId } = params;
+    const { roundId, playerId } = params;
 
-    const bet = await this.betRepo.findById(betId);
+    const bet = await this.betRepo.findActiveByRoundAndPlayer(roundId, playerId);
+
     if (!bet) throw new NotFoundException("BET_NOT_FOUND");
     if (bet.playerId !== playerId) throw new ForbiddenException("FORBIDDEN");
     if (bet.status !== BetStatus.CONFIRMED) {
       throw new ConflictException("BET_NOT_CONFIRMED");
     }
-
-    const round = await this.roundRepo.findWithLock(bet.round.id);
+    const round = await this.roundRepo.findById(bet.round.id);
     if (!round || round.status !== RoundStatus.ACTIVE) {
       throw new ConflictException("ROUND_NOT_ACTIVE");
     }
@@ -58,6 +60,8 @@ export class CashoutUseCase {
 
     bet.applyCashout(multiplier);
 
+    this.logger.debug("Multiplier aplied")
+
     const outbox = Outbox.buildWalletCreditMessage({
       betId: bet.id,
       playerId,
@@ -65,8 +69,11 @@ export class CashoutUseCase {
       cashoutMultiplier: bet.cashoutMultiplier!,
     });
 
+    this.logger.debug("Outboox => ", outbox)
+
     await this.betRepo.saveBetWithOutbox(bet, outbox);
 
+    this.logger.debug("Outbox saved")
     this.gameGateway.emitRoundCashout({
       roundId: round.id,
       playerId,
@@ -74,6 +81,12 @@ export class CashoutUseCase {
       cashoutMultiplier: multiplier,
       payoutCents: Number(bet.payoutCents),
     });
+    this.logger.debug({
+      betId: bet.id,
+      cashoutMultiplier: bet.cashoutMultiplier!,
+      payoutCents: bet.payoutCents!,
+      status: bet.status,
+    })
 
     return {
       betId: bet.id,
