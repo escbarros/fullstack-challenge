@@ -1,95 +1,325 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
 @import "tailwindcss";
 
-@theme {
-  /* ── Fonts ─────────────────────────────── */
-  --font-display: "Space Grotesk", sans-serif;
-  --font-ui:      "Manrope", sans-serif;
-  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+:root {
+  /* ---------------------------------------------------------------------- */
+  /* COLOR — RAW PALETTE                                                     */
+  /* ---------------------------------------------------------------------- */
 
-  /* ── Backgrounds (green-jungle) ────────── */
-  --color-bg-base:      #070B09;
-  --color-surface-1:    #0E1712;
-  --color-surface-2:    #152019;
-  --color-surface-elev: #1F2E25;
+  /* Backgrounds — jungle-tinted near-black, cool deep greens */
+  --bg-base:      #070B09;   /* app letterbox / deepest */
+  --bg-canvas:    #0B110E;   /* primary page background */
+  --surface-1:    #111A15;   /* cards, panels */
+  --surface-2:    #18241D;   /* raised inputs, list rows */
+  --surface-3:    #20302710; /* hover wash (used as overlay) */
+  --surface-elev: #1F2E25;   /* modals, popovers, menus */
 
-  /* ── Foregrounds ───────────────────────── */
-  --color-fg-1: #FFFFFF;
-  --color-fg-2: #A8B8AC;
-  --color-fg-3: #6B7F71;
+  /* Hairlines & borders */
+  --border:       #243029;   /* default 1px divider */
+  --border-soft:  #1A241D;   /* subtle inner divider */
+  --border-neon:  rgba(184,255,60,0.22); /* glowing edge on active */
 
-  /* ── Borders ───────────────────────────── */
-  --color-border-1: #2A3D30;
-  --color-border-2: #1A2B20;
+  /* Primary — electric lime (brand, CTAs, the rising curve) */
+  --lime-300:     #E4FFA6;
+  --lime-400:     #CFFF6E;   /* light hover */
+  --lime-500:     #B8FF3C;   /* PRIMARY */
+  --lime-600:     #9BE61F;   /* press */
+  --lime-700:     #6FA80F;
 
-  /* ── Lime (CTA / multiplier curve) ─────── */
-  --color-lime-500: #B8FF3C;
-  --color-lime-400: #CCFF70;
-  --color-lime-600: #8FCC1E;
+  /* Accent — hot magenta (energy, secondary CTA, "vs" / live) */
+  --magenta-400:  #FF6FBD;
+  --magenta-500:  #FF3DA6;   /* ACCENT */
+  --magenta-600:  #E01E88;
 
-  /* ── Magenta (live / secondary CTA) ────── */
-  --color-magenta-500: #FF3DA6;
-  --color-magenta-400: #FF70BC;
+  /* Accent — cyan (info, links, secondary data) */
+  --cyan-400:     #6FEEFF;
+  --cyan-500:     #34E5FF;   /* INFO */
+  --cyan-600:     #14C2DE;
 
-  /* ── Cyan (info / links) ───────────────── */
-  --color-cyan-500: #34E5FF;
+  /* Currency / gold (wallet, balances, jackpots) */
+  --gold-400:     #FFD577;
+  --gold-500:     #FFC247;   /* CURRENCY */
+  --gold-600:     #E0A226;
 
-  /* ── Gold (wallet / balance ONLY) ─────── */
-  --color-gold-500: #FFC247;
-  --color-gold-400: #FFD47A;
+  /* Win / Loss — the crash game's heartbeat */
+  --win-500:      #3DF07A;   /* cashout success, up */
+  --win-600:      #1FCB5C;
+  --loss-500:     #FF4D4D;   /* crash, down, danger */
+  --loss-600:     #E12B2B;
+  --warn-500:     #FFC247;
 
-  /* ── Win / Loss ─────────────────────────── */
-  --color-win-500:  #3DF07A;
-  --color-loss-500: #FF4D4D;
+  /* Text */
+  --fg-1:         #F2F7F1;   /* primary text (near white, faint green) */
+  --fg-2:         #A9B7AE;   /* secondary / labels */
+  --fg-3:         #6B7A70;   /* tertiary / placeholder / disabled */
+  --fg-on-lime:   #06140A;   /* dark text on lime button */
+  --fg-on-mag:    #1A0410;   /* dark text on magenta */
 
-  /* ── History pill heat scale ────────────── */
-  --color-heat-bust: #FF4D4D;
-  --color-heat-low:  #B8FF3C;
-  --color-heat-mid:  #FFC247;
-  --color-heat-high: #FF3DA6;
+  --color-bg:            var(--bg-canvas);
+  --color-surface:       var(--surface-1);
+  --color-surface-raised:var(--surface-2);
+  --color-surface-elev:  var(--surface-elev);
+  --color-text:          var(--fg-1);
+  --color-text-muted:    var(--fg-2);
+  --color-text-subtle:   var(--fg-3);
+  --color-border:        var(--border);
 
-  /* ── Spacing (4 px grid) ────────────────── */
-  --spacing-1:  4px;
-  --spacing-2:  8px;
-  --spacing-3:  12px;
-  --spacing-4:  16px;
-  --spacing-5:  20px;
-  --spacing-6:  24px;
-  --spacing-8:  32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  --spacing-20: 80px;
+  --color-primary:       var(--lime-500);
+  --color-primary-hover: var(--lime-400);
+  --color-primary-press: var(--lime-600);
+  --color-on-primary:    var(--fg-on-lime);
 
-  /* ── Radii ───────────────────────────────── */
-  --radius-xs:   6px;
-  --radius-sm:   8px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --radius-xl:   24px;
+  --color-accent:        var(--magenta-500);
+  --color-info:          var(--cyan-500);
+  --color-currency:      var(--gold-500);
+
+  --color-up:            var(--win-500);
+  --color-down:          var(--loss-500);
+  --color-success:       var(--win-500);
+  --color-danger:        var(--loss-500);
+  --color-warning:       var(--warn-500);
+
+
+  --heat-bust:   var(--loss-500);   /* < 2x */
+  --heat-low:    var(--lime-500);   /* 2x–10x */
+  --heat-high:   var(--gold-500);   /* 10x–50x */
+  --heat-moon:   var(--magenta-500);/* 50x+ */
+
+
+  --font-display: "Space Grotesk", "Space Grotesk Fallback", system-ui, sans-serif;
+  --font-ui:      "Manrope", system-ui, -apple-system, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Fluid-ish type scale (px). Multiplier hero uses --fs-multiplier. */
+  --fs-multiplier: 132px;  /* the big live multiplier */
+  --fs-display:    56px;   /* hero numerals / marketing */
+  --fs-h1:         34px;
+  --fs-h2:         26px;
+  --fs-h3:         20px;
+  --fs-title:      17px;   /* card titles */
+  --fs-body:       15px;
+  --fs-sm:         13px;
+  --fs-xs:         11px;   /* labels, eyebrows */
+
+  --lh-tight:   1.05;
+  --lh-snug:    1.25;
+  --lh-normal:  1.5;
+
+  --tracking-eyebrow: 0.14em;  /* uppercase labels */
+  --tracking-tight:  -0.02em;  /* display */
+  --tracking-num:     0.01em;  /* tabular numerals */
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+  --fw-bold:    700;
+
+  /* ---------------------------------------------------------------------- */
+  /* SPACING (4px base)                                                      */
+  /* ---------------------------------------------------------------------- */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ---------------------------------------------------------------------- */
+  /* RADII                                                                   */
+  /* ---------------------------------------------------------------------- */
+  --radius-xs:  6px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
   --radius-pill: 999px;
 
-  /* ── Motion ──────────────────────────────── */
-  --ease-out:  cubic-bezier(0.0, 0.0, 0.2, 1);
-  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --dur-fast:  120ms;
-  --dur-base:  200ms;
-  --dur-slow:  360ms;
+  /* ---------------------------------------------------------------------- */
+  /* ELEVATION — shadows + neon glows                                        */
+  /* ---------------------------------------------------------------------- */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-2: 0 6px 18px rgba(0,0,0,0.45);
+  --shadow-3: 0 18px 48px rgba(0,0,0,0.55);
+
+  /* Neon glows — soft outer bloom matched to the accent in use */
+  --glow-lime:    0 0 24px rgba(184,255,60,0.45), 0 0 4px rgba(184,255,60,0.6);
+  --glow-magenta: 0 0 24 rgba(255,61,166,0.45), 0 0 4px rgba(255,61,166,0.6);
+  --glow-cyan:    0 0 24px rgba(52,229,255,0.40), 0 0 4px rgba(52,229,255,0.6);
+  --glow-loss:    0 0 28px rgba(255,77,77,0.5),  0 0 6px rgba(255,77,77,0.7);
+  --glow-soft:    0 0 0 1px var(--border-neon), 0 0 18px rgba(184,255,60,0.18);
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--lime-500);
+
+  /* Motion */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap:  cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot */
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   360ms;
 }
 
-/* ── Semantic values (not Tailwind utilities) ── */
-:root {
-  --glow-lime:    0 0 24px 0 #B8FF3C66;
-  --glow-magenta: 0 0 24px 0 #FF3DA666;
-  --glow-cyan:    0 0 24px 0 #34E5FF66;
-  --glow-gold:    0 0 24px 0 #FFC24766;
-  --glow-loss:    0 0 24px 0 #FF4D4D66;
+@theme {
+  /* Mapping for Tailwind utilities */
+  --color-bg-base: var(--bg-base);
+  --color-bg-canvas: var(--bg-canvas);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-elev: var(--surface-elev);
+
+  --color-lime-300: var(--lime-300);
+  --color-lime-400: var(--lime-400);
+  --color-lime-500: var(--lime-500);
+  --color-lime-600: var(--lime-600);
+  --color-lime-700: var(--lime-700);
+
+  --color-magenta-400: var(--magenta-400);
+  --color-magenta-500: var(--magenta-500);
+  --color-magenta-600: var(--magenta-600);
+
+  --color-cyan-400: var(--cyan-400);
+  --color-cyan-500: var(--cyan-500);
+  --color-cyan-600: var(--cyan-600);
+
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+
+  --color-win-500: var(--win-500);
+  --color-win-600: var(--win-600);
+  --color-loss-500: var(--loss-500);
+  --color-loss-600: var(--loss-600);
+  --color-warn-500: var(--warn-500);
+
+  --color-fg-1: var(--fg-1);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-on-lime: var(--fg-on-lime);
+  --color-fg-on-mag: var(--fg-on-mag);
+
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-border-neon: var(--border-neon);
+
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-10: var(--space-10);
+  --spacing-12: var(--space-12);
+  --spacing-16: var(--space-16);
+  --spacing-20: var(--space-20);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-pill: var(--radius-pill);
 }
 
-@utility tabular {
+/* ============================================================================
+   SEMANTIC ELEMENT STYLES — opt-in via .jg-prose or direct element use
+   ============================================================================ */
+
+.jg-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+
+h1, .jg-h1 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+
+h2, .jg-h2 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+
+h3, .jg-h3 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+
+.jg-title {
+  font-family: var(--font-ui);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-title);
+  color: var(--fg-1);
+}
+
+p, .jg-body {
+  font-family: var(--font-ui);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--fg-2);
+}
+
+.jg-eyebrow {
+  font-family: var(--font-ui);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* Numerals — multipliers, balances, hashes. Tabular so digits don't jitter. */
+.jg-num {
+  font-family: var(--font-mono);
+  font-weight: var(--fw-bold);
   font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-num);
+  color: var(--fg-1);
 }
 
+.jg-multiplier {
+  font-family: var(--font-mono);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-multiplier);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--lime-500);
+  text-shadow: var(--glow-lime);
+}
+
+code, .jg-code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  color: var(--cyan-400);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 0.1em 0.4em;
+}
+
+/* ── Base Styles ── */
 * {
   box-sizing: border-box;
 }
@@ -98,11 +328,18 @@ html,
 body,
 #app {
   min-height: 100%;
-  background-color: var(--color-bg-base);
-  color: var(--color-fg-1);
+  background-color: var(--bg-canvas);
+  color: var(--fg-1);
   font-family: var(--font-ui);
 }
 
 body {
   margin: 0;
+}
+
+.lime-neon {
+    box-shadow: 0 0 24px 0 #B8FF3C66 !important;
+}
+.loss-neon {
+    box-shadow: var(--glow-loss)
 }
