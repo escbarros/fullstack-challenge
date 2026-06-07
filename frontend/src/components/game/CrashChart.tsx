@@ -101,6 +101,14 @@ export function CrashChart() {
   const live = status === 'active' || crashed;
   const isBetting = status === 'betting';
 
+  const [shaking, setShaking] = useState(false);
+  useEffect(() => {
+    if (!crashed) return;
+    setShaking(true);
+    const id = setTimeout(() => setShaking(false), 600);
+    return () => clearTimeout(id);
+  }, [crashed]);
+
   const value = live ? Math.max(multiplier, 1) : 1;
 
   const geom = useMemo(() => {
@@ -144,7 +152,7 @@ export function CrashChart() {
   const countdownSec = (bettingCountdown / 1000).toFixed(1);
 
   return (
-    <div ref={ref} className="relative w-full h-full overflow-hidden">
+    <div ref={ref} className={`relative w-full h-full overflow-hidden${shaking ? ' crash-shake' : ''}`}>
       <svg
         className="absolute inset-0 h-full w-full"
         width={width}
@@ -233,7 +241,7 @@ export function CrashChart() {
       {isBetting && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1">
           <span
-            className="jg-eyebrow text-lime-500"
+            className="jg-eyebrow text-lime"
             style={{ letterSpacing: '0.14em' }}
           >
             Next round in

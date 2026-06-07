@@ -245,7 +245,6 @@ p, .jg-body {
   font-size: var(--fs-xs);
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
-  color: var(--fg-3);
 }
 
 /* Numerals — multipliers, balances, hashes. Tabular so digits don't jitter. */
@@ -312,6 +311,20 @@ body {
 @keyframes shimmer {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
+}
+
+@keyframes crash-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-4px, -2px); }
+  30% { transform: translate( 4px,  1px); }
+  45% { transform: translate(-3px,  2px); }
+  60% { transform: translate( 3px, -1px); }
+  75% { transform: translate(-1px,  1px); }
+  90% { transform: translate( 1px,  0); }
+}
+
+.crash-shake {
+  animation: crash-shake 0.55s var(--ease-out);
 }
 
 .skeleton-shimmer {
