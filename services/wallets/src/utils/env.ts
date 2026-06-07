@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { InvalidEnvironmentVariableError } from "../domain/errors/invalid-environment-variable.error";
+import { InvalidEnvironmentVariableError } from "./errors/invalid-environment-variable.error";
 
 const envSchema = z.object({
   NODE_ENV: z
