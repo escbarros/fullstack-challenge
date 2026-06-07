@@ -4,6 +4,7 @@ import {
   ManyToOne,
   PrimaryKey,
   Property,
+  type Rel,
 } from "@mikro-orm/core";
 import { Wallet } from "./wallet.entity";
 
@@ -18,7 +19,7 @@ export class WalletTransaction {
   id: string = crypto.randomUUID();
 
   @ManyToOne(() => Wallet)
-  wallet!: Wallet;
+  wallet!: Rel<Wallet>;
 
   @Property({ length: 255, unique: true })
   idempotencyKey!: string;

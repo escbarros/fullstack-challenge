@@ -1,1 +1,1 @@
-export {};
+export { WalletsController } from "./wallets.controller";

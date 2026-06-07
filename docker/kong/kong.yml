@@ -23,7 +23,7 @@ plugins:
 consumers:
   - username: keycloak-issuer
     jwt_secrets:
-      - key: "http://keycloak:8080/realms/crash-game"
+      - key: "http://localhost:8081/realms/crash-game"
         algorithm: RS256
         rsa_public_key: |
           -----BEGIN PUBLIC KEY-----
@@ -83,39 +83,21 @@ services:
                 - exp
               secret_is_base64: false
               run_on_preflight: false
-          - name: pre-function
-            config:
-              access:
-                - |
-                  local token = kong.ctx.shared.authenticated_jwt_token
-                  if token then
-                    kong.service.request.set_header("X-User-Id",  token.sub)
-                    kong.service.request.set_header("X-Username", token.preferred_username)
-                  end
 
   - name: wallets-service
     url: http://wallets:4002
-    plugins:
-      - name: jwt
-        config:
-          header_names:
-            - authorization
-          key_claim_name: iss
-          claims_to_verify:
-            - exp
-          secret_is_base64: false
-          run_on_preflight: false
-      - name: pre-function
-        config:
-          access:
-            - |
-              local token = kong.ctx.shared.authenticated_jwt_token
-              if token then
-                kong.service.request.set_header("X-User-Id",  token.sub)
-                kong.service.request.set_header("X-Username", token.preferred_username)
-              end
     routes:
       - name: wallets-routes
         paths:
           - /wallets
-        strip_path: true
+        strip_path: false
+        plugins:
+          - name: jwt
+            config:
+              header_names:
+                - authorization
+              key_claim_name: iss
+              claims_to_verify:
+                - exp
+              secret_is_base64: false
+              run_on_preflight: false
