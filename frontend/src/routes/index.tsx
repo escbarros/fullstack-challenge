@@ -5,6 +5,7 @@ import { useAuth } from '#/hooks/useAuth';
 import { useGameSocket } from '#/hooks/useGameSocket';
 import { useRoundHistory } from '#/hooks/useRoundHistory';
 import { History } from '#/components/layout/History';
+import { CrashChart } from '#/components/game/CrashChart';
 
 export const Route = createFileRoute('/')({ component: CrashGamePage });
 
@@ -44,6 +45,7 @@ function CrashGamePage() {
             md:col-start-1 md:row-start-2
             lg:col-start-2 lg:row-start-2 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.07)_1px,transparent_0)] bg-[length:24px_24px]"
         >
+          <CrashChart />
         </Panel>
         {/*Place Bets*/}
         <Panel
