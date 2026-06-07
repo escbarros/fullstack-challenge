@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Navbar } from '#/components/ui/Navbar';
+import { Navbar } from '#/components/layout/Navbar';
 import { useAuth } from '#/hooks/useAuth';
 
 export const Route = createFileRoute('/')({ component: CrashGamePage });
