@@ -5,6 +5,7 @@ plugins:
     config:
       origins:
         - http://localhost:3000
+        - http://frontend:3000
         - http://localhost:5173
       methods:
         - GET
@@ -23,7 +24,7 @@ plugins:
 consumers:
   - username: keycloak-issuer
     jwt_secrets:
-      - key: "http://localhost:8081/realms/crash-game"
+      - key: "http://keycloak:8081/realms/crash-game"
         algorithm: RS256
         rsa_public_key: |
           -----BEGIN PUBLIC KEY-----
@@ -73,31 +74,17 @@ services:
         paths:
           - /games
         strip_path: false
-        plugins:
-          - name: jwt
-            config:
-              header_names:
-                - authorization
-              key_claim_name: iss
-              claims_to_verify:
-                - exp
-              secret_is_base64: false
-              run_on_preflight: false
 
   - name: wallets-service
     url: http://wallets:4002
     routes:
+      - name: wallets-docs
+        methods: [GET]
+        paths:
+          - /wallets/docs
+        strip_path: false
+
       - name: wallets-routes
         paths:
           - /wallets
         strip_path: false
-        plugins:
-          - name: jwt
-            config:
-              header_names:
-                - authorization
-              key_claim_name: iss
-              claims_to_verify:
-                - exp
-              secret_is_base64: false
-              run_on_preflight: false

@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# Creates additional databases from POSTGRES_EXTRA_DATABASES (comma-separated).
-# The default database (POSTGRES_DB) is created automatically by the official image.
-# Example: POSTGRES_EXTRA_DATABASES=games,wallets
-
 if [ -n "$POSTGRES_EXTRA_DATABASES" ]; then
   IFS=',' read -ra DATABASES <<< "$POSTGRES_EXTRA_DATABASES"
   for db in "${DATABASES[@]}"; do
