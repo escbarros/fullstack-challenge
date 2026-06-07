@@ -7,7 +7,7 @@
     "start": "bun run src/main.ts",
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
-    "test": "bun test tests/unit",
+    "test": "vitest run tests/unit",
     "test:e2e": "bun test tests/e2e",
     "migration:generate": "mikro-orm migration:create",
     "migration:up": "mikro-orm migration:up",
@@ -37,6 +37,7 @@
     "bun-types": "latest",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4"
   }
 }
