@@ -1,5 +1,94 @@
-
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
 @import "tailwindcss";
+
+@theme {
+  /* ── Fonts ─────────────────────────────── */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-ui:      "Manrope", sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Backgrounds (green-jungle) ────────── */
+  --color-bg-base:      #070B09;
+  --color-surface-1:    #0E1712;
+  --color-surface-2:    #152019;
+  --color-surface-elev: #1F2E25;
+
+  /* ── Foregrounds ───────────────────────── */
+  --color-fg-1: #FFFFFF;
+  --color-fg-2: #A8B8AC;
+  --color-fg-3: #6B7F71;
+
+  /* ── Borders ───────────────────────────── */
+  --color-border-1: #2A3D30;
+  --color-border-2: #1A2B20;
+
+  /* ── Lime (CTA / multiplier curve) ─────── */
+  --color-lime-500: #B8FF3C;
+  --color-lime-400: #CCFF70;
+  --color-lime-600: #8FCC1E;
+
+  /* ── Magenta (live / secondary CTA) ────── */
+  --color-magenta-500: #FF3DA6;
+  --color-magenta-400: #FF70BC;
+
+  /* ── Cyan (info / links) ───────────────── */
+  --color-cyan-500: #34E5FF;
+
+  /* ── Gold (wallet / balance ONLY) ─────── */
+  --color-gold-500: #FFC247;
+  --color-gold-400: #FFD47A;
+
+  /* ── Win / Loss ─────────────────────────── */
+  --color-win-500:  #3DF07A;
+  --color-loss-500: #FF4D4D;
+
+  /* ── History pill heat scale ────────────── */
+  --color-heat-bust: #FF4D4D;
+  --color-heat-low:  #B8FF3C;
+  --color-heat-mid:  #FFC247;
+  --color-heat-high: #FF3DA6;
+
+  /* ── Spacing (4 px grid) ────────────────── */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  20px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+
+  /* ── Radii ───────────────────────────────── */
+  --radius-xs:   6px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+
+  /* ── Motion ──────────────────────────────── */
+  --ease-out:  cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:  120ms;
+  --dur-base:  200ms;
+  --dur-slow:  360ms;
+}
+
+/* ── Semantic values (not Tailwind utilities) ── */
+:root {
+  --glow-lime:    0 0 24px 0 #B8FF3C66;
+  --glow-magenta: 0 0 24px 0 #FF3DA666;
+  --glow-cyan:    0 0 24px 0 #34E5FF66;
+  --glow-gold:    0 0 24px 0 #FFC24766;
+  --glow-loss:    0 0 24px 0 #FF4D4D66;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
 
 * {
   box-sizing: border-box;
@@ -9,9 +98,11 @@ html,
 body,
 #app {
   min-height: 100%;
+  background-color: var(--color-bg-base);
+  color: var(--color-fg-1);
+  font-family: var(--font-ui);
 }
 
 body {
   margin: 0;
 }
-
