@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from "@nestjs/common";
+import { Controller, Get, HttpStatus, Param, ParseUUIDPipe, Query } from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
@@ -105,7 +105,10 @@ export class RoundController {
   })
   @ApiNotFoundResponse({ description: "Round not found or seed not yet revealed" })
   @Get(":roundId/verify")
-  async verify(@Param("roundId", ParseUUIDPipe) roundId: string): Promise<ApiResponseDto<RoundVerifyResponseDto, null, null>> {
+  async verify(
+    @Param("roundId", new ParseUUIDPipe({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }))
+    roundId: string,
+  ): Promise<ApiResponseDto<RoundVerifyResponseDto, null, null>> {
     const result = await this.verifyRoundUseCase.execute(roundId);
     return ApiResponseDto.ok(result);
   }

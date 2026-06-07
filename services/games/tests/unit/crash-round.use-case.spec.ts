@@ -232,7 +232,6 @@ describe("CrashRoundUseCase", () => {
     await useCase.execute(ROUND_ID);
 
     const payload = vi.mocked(gateway.emitRoundCrashed).mock.calls[0][0];
-    console.log(payload)
     expect(typeof payload.crashPoint).toBe("number");
     expect(payload.crashPoint).toBeGreaterThanOrEqual(1);
   });
