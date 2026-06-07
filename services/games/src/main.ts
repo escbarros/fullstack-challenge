@@ -31,6 +31,7 @@ async function bootstrap(): Promise<void> {
     .setTitle("Game Service API")
     .setDescription("Round lifecycle and betting endpoints")
     .setVersion("1.0")
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("/games/docs", app, document);

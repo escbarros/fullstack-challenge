@@ -24,6 +24,7 @@
     "@nestjs/core": "^11.1.17",
     "@nestjs/microservices": "^11",
     "@nestjs/platform-express": "^11.1.17",
+    "@nestjs/swagger": "^11.4.4",
     "amqp-connection-manager": "^4",
     "amqplib": "^0.10",
     "pg": "^8",

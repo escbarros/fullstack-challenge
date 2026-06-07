@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { Transport, type MicroserviceOptions } from "@nestjs/microservices";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./utils/http-exception.filter";
 import type { Env } from "./utils/env";
@@ -21,6 +22,15 @@ async function bootstrap(): Promise<void> {
   });
 
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("Wallet Service API")
+    .setDescription("Player wallet balance endpoints")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup("/wallets/docs", app, document);
 
   await app.startAllMicroservices();
 
