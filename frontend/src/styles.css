@@ -178,6 +178,10 @@
   --color-fg-on-mag: var(--fg-on-mag);
 
   --color-border: var(--border);
+  --color-danger: var(--color-danger);
+  --color-lime: var(--color-lime-500);
+  --color-gold: var(--color-gold-500);
+  --color-magenta: var(--color-magenta-500);
   --color-border-soft: var(--border-soft);
   --color-border-neon: var(--border-neon);
 }
@@ -303,4 +307,21 @@ body {
     background: rgba(11, 17, 14, 0.82);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2)      0%,
+    var(--surface-elev)  40%,
+    var(--surface-2)     80%,
+    var(--surface-2)    100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
