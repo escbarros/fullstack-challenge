@@ -2,15 +2,18 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Navbar } from '#/components/layout/Navbar';
 import { Panel } from '#/components/ui/Panel';
 import { useAuth } from '#/hooks/useAuth';
+import { useWalletSync } from '#/hooks/useWalletSync';
 import { useGameSocket } from '#/hooks/useGameSocket';
 import { useRoundHistory } from '#/hooks/useRoundHistory';
 import { History } from '#/components/layout/History';
 import { CrashChart } from '#/components/game/CrashChart';
+import { PlaceBet } from '#/components/layout/PlaceBet';
 
 export const Route = createFileRoute('/')({ component: CrashGamePage });
 
 function CrashGamePage() {
   const { user, isAuthenticated, login, logout } = useAuth();
+  useWalletSync(user);
   useGameSocket();
   useRoundHistory();
 
@@ -53,6 +56,7 @@ function CrashGamePage() {
             md:col-start-1 md:row-start-3
             lg:col-start-1 lg:row-start-1 lg:row-span-2"
         >
+          <PlaceBet />
         </Panel>
         {/*Bets List*/}
         <Panel

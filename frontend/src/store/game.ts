@@ -18,7 +18,18 @@ export interface Bet {
   payoutCents: number | null;
 }
 
+export interface WalletInfo {
+  id: string;
+  playerId: string;
+  balanceCents: string;
+}
+
 export interface GameState {
+  // Wallet
+  wallet: WalletInfo | null;
+  setWallet: (wallet: WalletInfo) => void;
+  clearWallet: () => void;
+
   // Round
   roundId: string | null;
   status: RoundStatus;
@@ -50,7 +61,7 @@ export interface GameState {
   prependHistory: (item: HistoryItem) => void;
 }
 
-const HISTORY_LIMIT = 16;
+const HISTORY_LIMIT = 20;
 
 const initialRoundState = {
   roundId: null,
@@ -65,6 +76,10 @@ const initialRoundState = {
 };
 
 export const useGameStore = create<GameState>((set) => ({
+  wallet: null,
+  setWallet: (wallet) => set({ wallet }),
+  clearWallet: () => set({ wallet: null }),
+
   ...initialRoundState,
   history: [],
 

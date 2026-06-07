@@ -295,10 +295,10 @@ body {
   margin: 0;
 }
 
-.lime-neon {
+.lime-neon:not(:disabled) {
     box-shadow: 0 0 24px 0 #B8FF3C66 !important;
 }
-.loss-neon {
+.loss-neon:not(:disabled) {
     box-shadow: var(--glow-loss)
 }
 
@@ -330,10 +330,10 @@ body {
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    var(--surface-2)      0%,
+    var(--surface-1)      0%,
     var(--surface-elev)  40%,
-    var(--surface-2)     80%,
-    var(--surface-2)    100%
+    var(--surface-1)     80%,
+    var(--surface-1)    100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;

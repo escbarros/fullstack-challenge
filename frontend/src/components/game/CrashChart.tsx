@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useMultiplierEngine } from '#/hooks/useMultiplierEngine';
 import { elapsedForMultiplier, multiplierAt } from '#/lib/multiplier';
 import { useGameStore, type RoundStatus } from '#/store/game';
+import { CrashChartSkeleton } from './CrashChartSkeleton';
 
 const HEADROOM = 1.4;
 const SAMPLES = 64;
@@ -86,8 +87,6 @@ export function CrashChart() {
   const storeCrashPoint = useGameStore((s) => s.crashPoint);
   const bettingCountdown = useBettingCountdown();
 
-  // Persist the last known crash point so it remains available during the 3s
-  // crashed display window, even after the store has already reset to betting.
   const [lastCrashPoint, setLastCrashPoint] = useState<number | null>(null);
   useEffect(() => {
     if (storeCrashPoint != null) setLastCrashPoint(storeCrashPoint);
@@ -150,83 +149,98 @@ export function CrashChart() {
   const fillId = crashed ? 'crash-area-loss' : 'crash-area-lime';
 
   const countdownSec = (bettingCountdown / 1000).toFixed(1);
+  const isLoading = false;
 
   return (
     <div ref={ref} className={`relative w-full h-full overflow-hidden${shaking ? ' crash-shake' : ''}`}>
-      <svg
-        className="absolute inset-0 h-full w-full"
-        width={width}
-        height={height}
-        role="img"
-        aria-label="Live crash multiplier curve"
-      >
-        <title>Live crash multiplier curve</title>
-        <defs>
-          <linearGradient id="crash-area-lime" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--lime-500)" stopOpacity="0.20" />
-            <stop offset="100%" stopColor="var(--lime-500)" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="crash-area-loss" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--loss-500)" stopOpacity="0.20" />
-            <stop offset="100%" stopColor="var(--loss-500)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
+      {(status === 'active' || status === 'betting') && !isLoading && (
+        <div
+          className="absolute bottom-[-40%] left-[-10%] w-[120%] h-[120%] pointer-events-none opacity-15"
+          style={{ background: 'radial-gradient(ellipse at 35% bottom, var(--lime-500) 0%, transparent 75%)' }}
+        />
+      )}
+      {crashed && !isLoading && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-15"
+          style={{ background: 'radial-gradient(circle at center, var(--loss-500) 0%, transparent 70%)' }}
+        />
+      )}
+      {!isLoading ? (
+        <svg
+          className="absolute inset-0 h-full w-full"
+          width={width}
+          height={height}
+          role="img"
+          aria-label="Live crash multiplier curve"
+        >
+          <title>Live crash multiplier curve</title>
+          <defs>
+            <linearGradient id="crash-area-lime" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--lime-500)" stopOpacity="0.20" />
+              <stop offset="100%" stopColor="var(--lime-500)" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="crash-area-loss" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--loss-500)" stopOpacity="0.20" />
+              <stop offset="100%" stopColor="var(--loss-500)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
 
-        {geom.ticks.map((t) => (
-          <line
-            key={t.m}
-            x1={PAD.left}
-            y1={t.y}
-            x2={width - PAD.right}
-            y2={t.y}
-            stroke="rgba(255,255,255,0.05)"
-            strokeWidth={1}
-          />
-        ))}
+          {geom.ticks.map((t) => (
+            <line
+              key={t.m}
+              x1={PAD.left}
+              y1={t.y}
+              x2={width - PAD.right}
+              y2={t.y}
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth={1}
+            />
+          ))}
 
-        {live && (
-          <line
-            x1={geom.endX}
-            y1={PAD.top}
-            x2={geom.endX}
-            y2={geom.baseY}
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth={1}
-          />
-        )}
+          {live && (
+            <line
+              x1={geom.endX}
+              y1={PAD.top}
+              x2={geom.endX}
+              y2={geom.baseY}
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth={1}
+            />
+          )}
 
-        {geom.area && <path d={geom.area} fill={`url(#${fillId})`} />}
+          {geom.area && <path d={geom.area} fill={`url(#${fillId})`} />}
 
-        {geom.line && (
-          <path
-            d={geom.line}
-            fill="none"
-            stroke={stroke}
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{
-              filter: crashed
-                ? 'drop-shadow(0 0 8px rgba(255,77,77,0.75))'
-                : 'drop-shadow(0 0 7px rgba(184,255,60,0.7))',
-            }}
-          />
-        )}
+          {geom.line && (
+            <path
+              d={geom.line}
+              fill="none"
+              stroke={stroke}
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                filter: crashed
+                  ? 'drop-shadow(0 0 8px rgba(255,77,77,0.75))'
+                  : 'drop-shadow(0 0 7px rgba(184,255,60,0.7))',
+              }}
+            />
+          )}
 
-        {live && (
-          <circle
-            cx={geom.endX}
-            cy={geom.endY}
-            r={5}
-            fill={crashed ? 'var(--loss-500)' : 'var(--lime-300)'}
-            style={{
-              filter: crashed
-                ? 'drop-shadow(0 0 6px rgba(255,77,77,0.9))'
-                : 'drop-shadow(0 0 7px rgba(184,255,60,0.95))',
-            }}
-          />
-        )}
-      </svg>
+          {live && (
+            <circle
+              cx={geom.endX}
+              cy={geom.endY}
+              r={5}
+              fill={crashed ? 'var(--loss-500)' : 'var(--lime-300)'}
+              style={{
+                filter: crashed
+                  ? 'drop-shadow(0 0 6px rgba(255,77,77,0.9))'
+                  : 'drop-shadow(0 0 7px rgba(184,255,60,0.95))',
+              }}
+            />
+          )}
+        </svg>
+      ) : (<CrashChartSkeleton />)}
 
       {geom.ticks.map((t) => (
         <span
@@ -238,7 +252,7 @@ export function CrashChart() {
         </span>
       ))}
 
-      {isBetting && (
+      {isBetting && !isLoading && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1">
           <span
             className="jg-eyebrow text-lime"
@@ -264,7 +278,7 @@ export function CrashChart() {
         </div>
       )}
 
-      {!isBetting && crashed && crashPoint != null && (
+      {!isBetting && crashed && crashPoint != null && !isLoading && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span
             className="jg-multiplier flex items-baseline tabular-nums"
@@ -283,7 +297,7 @@ export function CrashChart() {
         </div>
       ) }
 
-      {!isBetting && !crashed &&(
+      {!isBetting && !crashed && !isLoading &&(
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
           <span
             className="jg-multiplier flex items-baseline tabular-nums"

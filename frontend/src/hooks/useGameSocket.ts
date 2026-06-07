@@ -25,8 +25,9 @@ async function hydrateFromRest() {
     } else if (status === 'crashed' && round.crashPoint != null) {
       store.setRoundCrashed({ roundId: round.id, crashPoint: round.crashPoint, serverSeed: '', clientSeed: '', seedHash: round.seedHash });
     }
-  } catch {
+  } catch (error: any){
     // No current round — stay idle
+    console.error(error)
   }
 }
 
