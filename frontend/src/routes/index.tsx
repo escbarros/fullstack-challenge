@@ -8,6 +8,7 @@ import { useRoundHistory } from '#/hooks/useRoundHistory';
 import { History } from '#/components/layout/History';
 import { CrashChart } from '#/components/game/CrashChart';
 import { PlaceBet } from '#/components/layout/PlaceBet';
+import { BetsList } from '#/components/layout/BetsList';
 
 export const Route = createFileRoute('/')({ component: CrashGamePage });
 
@@ -64,6 +65,7 @@ function CrashGamePage() {
             md:col-start-2 md:row-start-1 md:row-span-3
             lg:col-start-3 lg:row-start-1 lg:row-span-2"
         >
+          <BetsList />
         </Panel>
       </main>
     </div>

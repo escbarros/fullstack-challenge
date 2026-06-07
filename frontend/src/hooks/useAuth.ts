@@ -10,10 +10,6 @@ interface UseAuth {
   logout: () => void;
 }
 
-/**
- * Tracks the Keycloak session and keeps it in sync with oidc-client-ts events
- * (login, logout, silent renew, token expiry).
- */
 export function useAuth(): UseAuth {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);

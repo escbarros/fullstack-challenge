@@ -104,20 +104,50 @@ export const useGameStore = create<GameState>((set) => ({
   addBet: (bet) =>
     set((s) => ({
       bets: [...s.bets, { cashoutMultiplier: null, payoutCents: null, ...bet }],
+
+      wallet: s.wallet
+        ? {
+            ...s.wallet,
+            balanceCents: (
+              BigInt(s.wallet.balanceCents) - BigInt(bet.amountCents)
+            ).toString(),
+          }
+        : null,
     })),
 
-  updateCashout: ({ playerId, cashoutMultiplier, payoutCents }) =>
-    set((s) => ({
-      bets: s.bets.map((b) =>
-        b.playerId === playerId
-          ? { ...b, status: 'cashedout' as const, cashoutMultiplier, payoutCents }
-          : b,
-      ),
-      ownBet:
-        s.ownBet?.playerId === playerId
-          ? { ...s.ownBet, status: 'cashedout' as const, cashoutMultiplier, payoutCents }
-          : s.ownBet,
-    })),
+    updateCashout: ({ playerId, cashoutMultiplier, payoutCents }) =>
+      set((s) => ({
+        bets: s.bets.map((b) =>
+          b.playerId === playerId
+            ? {
+                ...b,
+                status: 'cashedout' as const,
+                cashoutMultiplier,
+                payoutCents,
+              }
+            : b,
+        ),
+
+        ownBet:
+          s.ownBet?.playerId === playerId
+            ? {
+                ...s.ownBet,
+                status: 'cashedout' as const,
+                cashoutMultiplier,
+                payoutCents,
+              }
+            : s.ownBet,
+
+        wallet:
+          s.ownBet?.playerId === playerId && s.wallet
+            ? {
+                ...s.wallet,
+                balanceCents: (
+                  BigInt(s.wallet.balanceCents) + BigInt(payoutCents)
+                ).toString(),
+              }
+            : s.wallet,
+      })),
 
   setHistory: (items) => set({ history: items }),
 

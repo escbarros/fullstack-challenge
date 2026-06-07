@@ -69,6 +69,7 @@ export function useGameSocket(): void {
     });
 
     socket.on('round:cashout', (payload: { roundId: string; playerId: string; username: string; cashoutMultiplier: number; payoutCents: number }) => {
+      console.log("Cashed out")
       store().updateCashout({
         playerId: payload.playerId,
         cashoutMultiplier: payload.cashoutMultiplier,
