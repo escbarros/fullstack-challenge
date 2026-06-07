@@ -102,18 +102,21 @@ export const useGameStore = create<GameState>((set) => ({
   setMultiplier: (value) => set({ multiplier: value }),
 
   addBet: (bet) =>
-    set((s) => ({
-      bets: [...s.bets, { cashoutMultiplier: null, payoutCents: null, ...bet }],
-
-      wallet: s.wallet
-        ? {
-            ...s.wallet,
-            balanceCents: (
-              BigInt(s.wallet.balanceCents) - BigInt(bet.amountCents)
-            ).toString(),
-          }
-        : null,
-    })),
+    set((s) => {
+      const isOwn = s.wallet?.playerId === bet.playerId;
+      return {
+        bets: [...s.bets, { cashoutMultiplier: null, payoutCents: null, ...bet }],
+        ownBet: isOwn ? { cashoutMultiplier: null, payoutCents: null, ...bet } : s.ownBet,
+        wallet: isOwn && s.wallet
+          ? {
+              ...s.wallet,
+              balanceCents: (
+                BigInt(s.wallet.balanceCents) - BigInt(bet.amountCents)
+              ).toString(),
+            }
+          : s.wallet,
+      };
+    }),
 
     updateCashout: ({ playerId, cashoutMultiplier, payoutCents }) =>
       set((s) => ({
@@ -139,7 +142,7 @@ export const useGameStore = create<GameState>((set) => ({
             : s.ownBet,
 
         wallet:
-          s.ownBet?.playerId === playerId && s.wallet
+          s.wallet?.playerId === playerId
             ? {
                 ...s.wallet,
                 balanceCents: (
