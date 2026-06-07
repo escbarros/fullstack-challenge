@@ -1,5 +1,6 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
+import { CreateRequestContext, MikroORM } from "@mikro-orm/core";
 import { DebitWalletUseCase } from "../application/debit-wallet.use-case";
 import { CreditWalletUseCase } from "../application/credit-wallet.use-case";
 
@@ -16,11 +17,13 @@ interface WalletCreditMessage {
 @Controller()
 export class WalletConsumer {
   constructor(
+    private readonly orm: MikroORM,
     private readonly debitUseCase: DebitWalletUseCase,
     private readonly creditUseCase: CreditWalletUseCase,
   ) {}
 
   @MessagePattern("wallet.debit")
+  @CreateRequestContext()
   async handleDebit(@Payload() message: WalletDebitMessage): Promise<void> {
     await this.debitUseCase.execute({
       betId: message.data.betId,
@@ -31,6 +34,7 @@ export class WalletConsumer {
   }
 
   @MessagePattern("wallet.credit")
+  @CreateRequestContext()
   async handleCredit(@Payload() message: WalletCreditMessage): Promise<void> {
     await this.creditUseCase.execute({
       betId: message.data.betId,

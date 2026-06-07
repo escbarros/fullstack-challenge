@@ -43,6 +43,12 @@ export class Wallet {
     return wallet;
   }
 
+  private initTransactions() {
+    if (!this._transactions) {
+      (this as any)._transactions = [];
+    }
+  }
+
   debit(amountCents: bigint, idempotencyKey: string): WalletTransaction {
     if (amountCents < BigInt(Wallet.MIN_DEBIT_CENTS)) throw new DebitAmountTooLowError();
     if (amountCents > BigInt(Wallet.MAX_DEBIT_CENTS)) throw new DebitAmountTooHighError();
@@ -61,6 +67,7 @@ export class Wallet {
     tx.balanceBeforeCents = String(before);
     tx.balanceAfterCents = String(after);
 
+    this.initTransactions();
     this._transactions.push(tx);
     return tx;
   }
@@ -80,11 +87,13 @@ export class Wallet {
     tx.balanceBeforeCents = String(before);
     tx.balanceAfterCents = String(after);
 
+    this.initTransactions();
     this._transactions.push(tx);
     return tx;
   }
 
   isAlreadyProcessed(idempotencyKey: string): boolean {
+    this.initTransactions();
     return this._transactions.some((tx) => tx.idempotencyKey === idempotencyKey);
   }
 }

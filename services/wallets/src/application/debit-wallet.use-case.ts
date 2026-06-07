@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { WalletRepository } from "../domain/wallet.repository";
 import { InsufficientBalanceError } from "../domain/errors/insufficient-balance.error";
 import { WalletRabbitMQPublisher } from "../infrastructure/wallet-rabbitmq.publisher";
