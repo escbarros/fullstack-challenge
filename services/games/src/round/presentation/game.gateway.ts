@@ -65,4 +65,8 @@ export class GameGateway implements OnGatewayConnection {
   emitRoundTick(payload: { roundId: string; elapsedMs: number }) {
     this.server.to('game').emit('round:tick', payload);
   }
+
+  emitBetCancelled(payload: { betId: string; playerId: string; reason: string }) {
+    this.server.to('game').emit('bet:cancelled', payload);
+  }
 }

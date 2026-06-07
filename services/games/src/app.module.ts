@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ScheduleModule } from "@nestjs/schedule";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { defineConfig, PostgreSqlDriver } from "@mikro-orm/postgresql";
 import { validate } from "./utils/env";
@@ -11,6 +12,7 @@ import { OutboxModule } from "./outbox/outbox.module";
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate }),
+    ScheduleModule.forRoot(),
     MikroOrmModule.forRootAsync({
       driver: PostgreSqlDriver,
       useFactory: (config: ConfigService<Env, true>) =>

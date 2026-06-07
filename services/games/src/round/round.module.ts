@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { Round } from "./domain/round.entity";
 import { RoundRepository } from "./domain/round.repository";
@@ -19,7 +19,7 @@ import {
 import { BetModule } from "../bet/bet.module";
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Round]), BetModule],
+  imports: [MikroOrmModule.forFeature([Round]), forwardRef(() => BetModule)],
   controllers: [RoundController],
   providers: [
     GameGateway,

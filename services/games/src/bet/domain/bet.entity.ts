@@ -35,6 +35,9 @@ export class Bet {
   @Property({ type: 'uuid', index: true })
   playerId!: string;
 
+  @Property({ length: 255 })
+  username!: string;
+
   @Property({ type: 'bigint' })
   amountCents!: string;
 
