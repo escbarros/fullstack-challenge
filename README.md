@@ -431,27 +431,8 @@ bun test tests/e2e
 
 ## Decisões Arquiteturais e Trade-offs
 
-### 1. Outbox Pattern em vez de dual-write
 
-**Decisão:** A aposta é persistida e a mensagem de débito (`wallet.debit`) é inserida na tabela `outbox` dentro da mesma transação de banco de dados. Um poller publica as mensagens pendentes no RabbitMQ.
-
-**Por quê:** Garante consistência entre o banco local e o broker sem transações distribuídas (2PC). Se o serviço reiniciar após inserir a aposta mas antes de publicar no broker, o poller vai reprocessar na próxima execução. O único custo é latência de ~1s para publicação.
-
-**Trade-off:** Adiciona complexidade (tabela extra, poller separado). A alternativa seria aceitar o risco de perder mensagens em caso de falha entre o commit e o publish — inaceitável para operações financeiras.
-
----
-
-### 2. Race condition de cashout resolvida pelo banco
-
-**Decisão:** O caso de corrida entre cashout e crash é resolvido via `SELECT ... FOR UPDATE` na linha do round. Quem adquirir o lock primeiro vence.
-
-**Por quê:** O banco é o árbitro de verdade — elimina ambiguidade e lógica de retry no serviço. A alternativa seria um sistema de lock distribuído (Redis SETNX), que adiciona uma dependência de infra e novos pontos de falha.
-
-**Trade-off:** Contention de lock em rodadas com alto volume de cashouts simultâneos. Em escala, poderia ser mitigado com sharding por round.
-
----
-
-### 3. Entity = ORM Entity (sem camada de mapeamento)
+### Entity = ORM Entity (sem camada de mapeamento)
 
 **Decisão:** As entidades de domínio são diretamente as entidades MikroORM, sem objetos de domínio puros separados.
 
@@ -461,45 +442,7 @@ bun test tests/e2e
 
 ---
 
-### 4. Precisão monetária com BIGINT cents
-
-**Decisão:** Todos os valores monetários são armazenados e trafegados como inteiros em centavos (`BIGINT`). Nunca floats.
-
-**Por quê:** Aritmética de ponto flutuante é imprecisa para dinheiro (`0.1 + 0.2 ≠ 0.3`). Centavos inteiros eliminam esse problema por completo.
-
-**Como:** `R$ 10,50` → `1050`. Multiplicadores são `NUMERIC(10,2)` no banco. A conversão para exibição (`amountCents / 100`) acontece exclusivamente no frontend.
-
----
-
-### 5. Multiplicador calculado, nunca armazenado
-
-**Decisão:** O multiplicador em tempo real não é persistido. É sempre calculado a partir de `startedAt` via `e^(elapsed × GROWTH_RATE)`.
-
-**Por quê:** Elimina sincronização de estado distribuído. O crash point pré-determinado funciona como "verdade absoluta" — o multiplicador é apenas uma função do tempo. O frontend calcula localmente a cada frame via `requestAnimationFrame`, com correção de drift pelos eventos `round:tick`.
-
----
-
-### 6. Idempotência por chave na tabela de transações
-
-**Decisão:** O Wallet Service verifica se a `idempotencyKey` já existe em `wallet_transactions` antes de processar qualquer operação. Se existir, apenas faz ACK da mensagem sem reprocessar.
-
-**Por quê:** RabbitMQ garante at-least-once delivery — a mesma mensagem pode ser entregue mais de uma vez. Sem idempotência, um retry causaria double-debit ou double-credit.
-
-**Chaves usadas:** `wallet.debit:{betId}` e `wallet.credit:{betId}`.
-
----
-
-### 7. Kong como único ponto de autenticação
-
-**Decisão:** Os serviços de backend nunca validam JWT. Confiam nos headers `X-User-Id` e `X-Username` injetados pelo Kong após validação do token Keycloak.
-
-**Por quê:** Centraliza a lógica de autenticação, evita duplicação de código e dependências de validação JWT em cada serviço.
-
-**Trade-off:** Os serviços precisam confiar na rede interna (Kong → serviços). Em produção, isso seria reforçado com mTLS ou rede privada.
-
----
-
-### 8. Spec-Driven Development
+### Spec-Driven Development
 
 Todo o desenvolvimento seguiu specs escritas antes do código, disponíveis em `docs/specs/`. Cada spec define user stories, contrato técnico, edge cases e critérios de aceitação. Foram escritas 33 specs ao longo do projeto.
 
