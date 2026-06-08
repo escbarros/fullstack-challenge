@@ -2,6 +2,9 @@
 
 Plataforma multiplayer de crash game em tempo real. Um multiplicador sobe a partir de `1.00×` e pode crashar a qualquer momento. Jogadores apostam antes da rodada e precisam sacar antes do crash para garantir os ganhos.
 
+> **Credenciais de acesso**
+> Usuário: `player` | Senha: `player123`
+
 ---
 
 ## Sumário
@@ -156,7 +159,14 @@ PENDING → CANCELLED  (timeout de débito)
 
 ### Subir tudo
 
-**1. Copie os arquivos de ambiente:**
+**1. Clone o repositório e entre na pasta:**
+
+```bash
+git clone <repo-url>
+cd fullstack-challenge
+```
+
+**2. Copie os arquivos de ambiente:**
 
 ```bash
 cp services/games/.env.example services/games/.env
@@ -164,11 +174,9 @@ cp services/wallets/.env.example services/wallets/.env
 cp frontend/.env.example frontend/.env
 ```
 
-**2. Instale as dependências e suba os containers:**
+**3. Instale as dependências e suba os containers:**
 
 ```bash
-git clone <repo-url>
-cd fullstack-challenge
 bun install
 bun run docker:up
 ```
